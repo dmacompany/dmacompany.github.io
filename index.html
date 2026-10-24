@@ -31,7 +31,7 @@ header.main .wrap{display:flex;align-items:center;justify-content:space-between;
 .brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:#17141A}
 .brand img{height:72px;width:auto;display:block}.brand img.word{height:24px;margin-bottom:2px}
 .brand b{display:block;font-weight:700;font-size:26px;letter-spacing:.04em;line-height:1}
-.brand small{display:block;font-size:12px;letter-spacing:.18em;color:#8B8489;margin-top:6px}
+.brand>span{display:flex;flex-direction:column;width:max-content}.brand small{display:block;width:0;min-width:100%;font-size:13px;font-weight:600;letter-spacing:.14em;color:#4A454C;margin-top:7px;text-align:justify;text-align-last:justify;white-space:nowrap}
 .menu{display:flex;gap:30px;list-style:none;margin:0;padding:0}
 .menu a{color:#4A454C;text-decoration:none;text-transform:uppercase;letter-spacing:.08em;font-size:14px;font-weight:500;padding:8px 0;border-bottom:2px solid transparent}
 .menu a:hover{color:#17141A;border-color:var(--rose)}
@@ -122,7 +122,7 @@ footer .legal{border-top:1px solid #2A2729;margin-top:48px;padding:20px 0;font-s
 @media (max-width:620px){
  section{padding:64px 0}
  .top .info span.h{display:none}
- header.main .wrap{min-height:76px}.brand img{height:54px}.brand img.word{height:18px}.brand b{font-size:20px}.brand small{font-size:10px;letter-spacing:.12em}
+ header.main .wrap{min-height:76px}.brand img{height:54px}.brand img.word{height:18px}.brand b{font-size:20px}.brand small{font-size:10.5px;letter-spacing:.1em;margin-top:5px}
  .grid,.feat,.steps,.fam,footer .cols{grid-template-columns:1fr}
  .saggio .txt{padding:28px 20px}
  .btn.ghost{margin:12px 0 0}
