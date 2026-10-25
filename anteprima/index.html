@@ -16,7 +16,7 @@ input,select,button{font:inherit}
 .prev{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:#2A2A30;color:#fff;font:600 13px system-ui,sans-serif;padding:8px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
 .prev nav{display:flex;gap:6px;flex-wrap:wrap}.prev a{padding:6px 12px;border-radius:999px;text-decoration:none;color:#fff}.prev a[aria-current]{background:#fff;color:#111}
 .top{background:var(--bar);color:var(--on-bar);font-size:13px}
-.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;flex-wrap:wrap}
+.top .wrap{max-width:none;padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px));display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;flex-wrap:wrap}
 .top .info{display:flex;gap:6px 28px;flex-wrap:wrap;padding:6px 0}.top .info span{display:flex;align-items:center;gap:8px;opacity:.92}
 .top .soc{display:flex;align-self:stretch}.top .soc a{display:grid;place-items:center;width:48px;color:#fff;border-left:1px solid #2C2C30}.top .soc a:last-child{border-right:1px solid #2C2C30}.top .soc a:hover{background:var(--rose);color:var(--on-rose)}
 .top svg{width:16px;height:16px;fill:currentColor}
