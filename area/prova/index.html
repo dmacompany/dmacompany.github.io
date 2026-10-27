@@ -224,6 +224,8 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
   }});
 document.addEventListener("change",e=>{const t=e.target;if(t.dataset&&t.dataset.a==="cons"){const k=SOCIO.figli.find(x=>x.id===t.dataset.id);k.immagini=t.checked;toast(t.checked?"Consenso foto e video dato per "+k.nome:"Consenso foto e video revocato per "+k.nome)}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="cd")document.querySelector('[data-a="verify"]').click()});
+/* link personale: ?k=... apre l'area senza codice */
+(function(){try{const k=new URLSearchParams(location.search).get("k");if(k){S.logged=true;S.view="home";setTimeout(()=>toast("Accesso con il link personale"),300)}}catch(x){}})();
 render();
 </script>
 
