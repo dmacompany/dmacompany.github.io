@@ -315,7 +315,7 @@ async function invia(){const b=$("#next"),es=$("#esito");const d=dati();es.class
   b.disabled=true;b.textContent="Invio in corso…";
   try{const r=await fetch(CONFIG.ENDPOINT,{method:"POST",body:JSON.stringify(d)});const j=await r.json();
     if(!j.ok)throw new Error(j.errore||"errore");
-    es.classList.add("ok");es.innerHTML=`<b>Iscrizione inviata.</b> Codice ${j.codice}. Ti abbiamo mandato un'email di conferma. La segreteria ti scriverà su WhatsApp con l'importo e il link per caricare la ricevuta del bonifico.`;
+    es.classList.add("ok");es.innerHTML=`<b>Iscrizione inviata.</b> Codice ${j.codice}. Ti abbiamo inviato un'email di conferma. La segreteria ti scriverà su WhatsApp con l'importo e il link per caricare la ricevuta del bonifico.`;
     $("#prev").classList.add("hidden");b.classList.add("hidden");try{localStorage.removeItem("dma.isc")}catch(x){}}
   catch(x){es.classList.add("warn");es.innerHTML="Invio non riuscito. Riprova tra poco oppure scrivici su <a href='https://wa.me/393383787702'>WhatsApp</a>.";b.disabled=false;b.textContent="Riprova l'invio"}}
 

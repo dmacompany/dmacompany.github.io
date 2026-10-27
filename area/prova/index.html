@@ -133,11 +133,11 @@ function vLogin(){
   ${S.step==="email"?`<div class="card" style="margin-top:18px">
     <label for="em">Email usata per l'iscrizione<input id="em" type="email" value="${SOCIO.genitore.email}" autocomplete="email"></label>
     <div style="margin-top:16px"><button class="btn" style="width:100%" data-a="sendCode">Ricevi il codice di accesso</button></div>
-    <p class="note" style="margin:12px 0 0">Ti mandiamo un codice di 6 cifre via email. Non serve ricordare nessuna password.</p>
+    <p class="note" style="margin:12px 0 0">Ti inviamo un codice di 6 cifre via email. Non serve ricordare nessuna password.</p>
     <div class="or">oppure</div>
     <button class="btn ghost" style="width:100%" data-a="magic">Ho il link personale ricevuto su WhatsApp</button>
   </div>`:`<div class="card" style="margin-top:18px">
-    <p style="margin:0">Abbiamo mandato un codice a <b>${$("#em")?$("#em").value:SOCIO.genitore.email}</b>. Vale 10 minuti.</p>
+    <p style="margin:0">Abbiamo inviato un codice a <b>${$("#em")?$("#em").value:SOCIO.genitore.email}</b>. Vale 10 minuti.</p>
     <label for="cd">Codice di accesso<input id="cd" class="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••"></label>
     <p class="note" id="cdErr" style="color:var(--rose-d);min-height:1.2em;margin:8px 0 0"></p>
     <div style="margin-top:8px"><button class="btn" style="width:100%" data-a="verify">Entra</button></div>
