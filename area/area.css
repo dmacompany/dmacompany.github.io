@@ -1,0 +1,45 @@
+/* Area riservata soci – viste dopo l'accesso (si appoggia ai colori di /area/index.html) */
+.ar h1{text-transform:none;font-size:clamp(24px,4.6vw,32px);margin:4px 0 0}
+.ar h2{margin:0 0 12px;font-size:17px;font-weight:700}
+.ar .card{padding:18px}
+.ar .stack{display:grid;gap:14px}
+.ar .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.ar .grid2{grid-template-columns:minmax(0,1fr)}}
+.ar .kids{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 18px}
+.ar .kid{display:flex;align-items:center;gap:8px;padding:7px 14px 7px 7px;border:1px solid var(--line);border-radius:999px;background:var(--card);cursor:pointer;font-weight:600;font-size:14px}
+.ar .av{width:28px;height:28px;border-radius:50%;background:var(--rose);color:#fff;display:grid;place-items:center;font-weight:700;font-size:11px;flex:none}
+.ar .kid[aria-pressed="true"]{border-color:var(--rose);background:var(--rose-s)}
+.ar .pill{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.ar .pill.ok{background:var(--ok-s);color:var(--ok)}.ar .pill.warn{background:var(--warn-s);color:var(--warn)}.ar .pill.bad{background:var(--rose-s);color:var(--rose-d)}.ar .pill.n{background:var(--bg);color:var(--ink2);border:1px solid var(--line)}
+.ar .row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line);border-bottom:0}
+.ar .row:first-of-type{border-top:0}
+.ar .row .t{min-width:0}.ar .row .t b{display:block;font-weight:600}.ar .row .t span{font-size:13px;color:var(--ink2)}
+.ar .num{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.ar .alert{padding:14px 16px;border-radius:12px;background:var(--warn-s);color:var(--warn);font-size:14.5px}
+.ar .alert b{display:block}.ar .alert.ok{background:var(--ok-s);color:var(--ok)}.ar .alert a{color:inherit;font-weight:700}
+.ar .mesi{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.ar .mese{border-radius:9px;padding:8px 4px;text-align:center;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink2)}
+.ar .mese i{display:block;font-style:normal;font-size:10.5px;font-weight:500;margin-top:2px}
+.ar .mese.ok{background:var(--ok-s);color:var(--ok);border-color:transparent}
+.ar .mese.due{background:var(--rose-s);color:var(--rose-d);border-color:transparent}
+.ar .actions{display:flex;gap:8px;flex-wrap:wrap}
+.ar .btn{padding:10px 18px;font-size:12.5px}.ar .btn.small{padding:7px 13px;font-size:11.5px}
+.ar .note{font-size:13px;color:var(--ink2)}
+.ar .drop{border:2px dashed var(--line);border-radius:12px;padding:16px;text-align:center}
+.ar .drop input[type=text],.ar .drop input[type=date]{max-width:240px;margin:8px auto 0;display:block}
+.ar dl{margin:0;display:grid;grid-template-columns:minmax(110px,auto) minmax(0,1fr);gap:8px 16px;font-size:14.5px}
+.ar dt{color:var(--ink2)}.ar dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
+.ar .switch{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.ar .switch:first-of-type{border-top:0}.ar .switch input{width:44px;height:24px;accent-color:var(--rose);flex:none}
+.ar .tabs{position:sticky;top:0;z-index:20;background:var(--bg);display:flex;gap:4px;margin:0 0 18px;border-bottom:1px solid var(--line);overflow-x:auto}
+.ar .tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;font-weight:600;font-size:14px;color:var(--ink2);cursor:pointer;white-space:nowrap}
+.ar .tab[aria-current="page"]{color:var(--ink);border-color:var(--rose)}
+.ar .tab:focus-visible,.ar .kid:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.ar .top2{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.ar .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111014;color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;z-index:40;max-width:calc(100% - 32px)}
+.wait{opacity:.6;pointer-events:none}
+.ar .stack>*,.ar .grid2>*{min-width:0}
+.ar .box,.ar .alert,.ar .note{text-align:left}
+.ar .drop input[type=file]{max-width:100%}
+.ar .tab{padding:10px 9px;font-size:13.5px}
