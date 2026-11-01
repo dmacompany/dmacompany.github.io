@@ -3,7 +3,7 @@
    I dati arrivano dallo script Google privato, solo quelli del socio collegato. */
 (function(){
 "use strict";
-const CONFIG={ENDPOINT:"https://script.google.com/macros/s/AKfycbw5jpPOWk_QB-QDwX8xCz6-DWgdfYBJA68MVEhk05PDaB1mAT3UTFEvldAj0hI49ojU/exec"};   // indirizzo dell'app web Google Apps Script (vuoto = area non ancora attiva)
+const CONFIG={ENDPOINT:"https://script.google.com/macros/s/AKfycbyVTh6uGSNhZMPpU_dw638gtyPE472kwAbnOBf0FsIEgERznmrI2ucqh62RYxGAuiNa/exec"};   // indirizzo dell'app web Google Apps Script (vuoto = area non ancora attiva)
 const WA="https://wa.me/393383787702";
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
