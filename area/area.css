@@ -43,3 +43,9 @@
 .ar .box,.ar .alert,.ar .note{text-align:left}
 .ar .drop input[type=file]{max-width:100%}
 .ar .tab{padding:10px 9px;font-size:13.5px}
+
+.ar .tessbox{display:inline-flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.ar .tess{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--rose);border-radius:999px;background:var(--card);color:var(--rose-d);font-weight:700;font-size:13.5px;cursor:pointer}
+.ar .tess:hover{background:var(--rose-s)}
+.ar .kids{align-items:center}
+@media (max-width:520px){.ar .tessbox{margin-left:0;width:100%}}
