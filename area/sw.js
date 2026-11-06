@@ -1,7 +1,8 @@
 /* Area soci DMA COMPANY – service worker: apre l'app anche con rete lenta.
    I dati personali non vengono mai salvati qui: passano solo le pagine e la grafica. */
-const V = "dma-area-v2";
-const SHELL = ["/area/", "/area/area.js?v=9", "/area/area.css?v=9", "/area/registro.js?v=1", "/area/app.js?v=1", "/fonts/montserrat.css",
+const BASE = self.registration.scope.replace(location.origin, "");   // "/area/" oppure "/registro/"
+const V = "dma-" + BASE.replace(/\//g, "") + "-v3";
+const SHELL = [BASE, "/area/area.js?v=9", "/area/area.css?v=9", "/area/registro.js?v=1", "/area/app.js?v=2", "/fonts/montserrat.css",
   "/fonts/montserrat-latin-400-normal.woff2", "/fonts/montserrat-latin-600-normal.woff2", "/fonts/montserrat-latin-700-normal.woff2",
   "/area/icon-192.png", "/area/apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
@@ -9,8 +10,8 @@ self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Pr
 self.addEventListener("fetch", e => {
   const r = e.request, u = new URL(r.url);
   if (r.method !== "GET" || u.origin !== location.origin) return;          // dati e Google: sempre dalla rete
-  if (!(u.pathname.startsWith("/area/") || u.pathname.startsWith("/fonts/"))) return;
-  const key = u.pathname === "/area/" || u.pathname === "/area/index.html" ? "/area/" : r;
+  if (!(u.pathname.startsWith("/area/") || u.pathname.startsWith("/registro/") || u.pathname.startsWith("/fonts/"))) return;
+  const key = u.pathname === BASE || u.pathname === BASE + "index.html" ? BASE : r;
   e.respondWith(fetch(r).then(res => { if (res.ok) { const cp = res.clone(); caches.open(V).then(c => c.put(key, cp)); } return res; })
     .catch(() => caches.match(key)));
 });
