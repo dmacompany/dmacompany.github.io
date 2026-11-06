@@ -4,7 +4,6 @@
   "short_name": "DMA Registro",
   "description": "Registro presenze dei corsi DMA COMPANY · TinkerDance ASD per istruttori e segreteria",
   "lang": "it",
-  "start_url": "/registro/?app=1",
   "scope": "/registro/",
   "display": "standalone",
   "orientation": "portrait",

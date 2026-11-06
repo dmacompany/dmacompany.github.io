@@ -65,6 +65,7 @@
     catch (x) { R.riep = []; if (x.message !== "sessione") toast("Riepilogo non caricato"); }
     render();
   }
+  const lst0 = al => Object.keys(al);
   function vRiep() {
     const sel = `<label class="dsel">Mese <select data-r="mese">${stagioneMesi().map(m => `<option value="${m}"${m === R.mese ? " selected" : ""}>${meseNome(m)}</option>`).join("")}</select></label>`;
     if (!R.riep) return `<div class="card"><div class="top2"><h2 style="margin:0">Riepilogo</h2>${sel}</div><p class="note">Caricamento…</p></div>`;
@@ -76,10 +77,15 @@
       const al = {};
       mine.filter(r => r.stato !== "L").forEach(r => { const k = r.nominativo; al[k] = al[k] || { P: 0, A: 0, G: 0, socio: r.socio }; al[k][r.stato] = (al[k][r.stato] || 0) + 1; });
       const lst = Object.keys(al).sort((a, b) => a.localeCompare(b));
-      cards.push(`<div class="card"><h2>${esc(c.nome)}</h2><p class="note" style="margin:-6px 0 10px">Lezioni tenute: <b>${lez.length}</b>${lez.length ? " · " + lez.map(d => +d.slice(8)).join(", ") : ""}</p>
-        <div class="tw"><table class="ptab"><thead><tr><th>Allievo</th><th>Presenze</th><th>Assenze</th><th>Giustif.</th></tr></thead><tbody>
-        ${lst.map(k => `<tr><td>${esc(k)}${al[k].socio ? "" : ' <span class="pill n">extra</span>'}</td><td class="num">${al[k].P}</td><td class="num">${al[k].A}</td><td class="num">${al[k].G}</td></tr>`).join("") || `<tr><td colspan="4" class="note">Nessuna presenza segnata</td></tr>`}
-        </tbody></table></div></div>`);
+      // calendario come il foglio cartaceo: una riga per allievo, una colonna per ogni lezione del mese
+      const nomi = [...new Set((c.allievi || []).map(x => x.nome).concat(lst0(al)))].sort((x, y) => x.localeCompare(y));
+      const cella = (n, d) => { const r = mine.find(x => x.data === d && x.nominativo === n && x.stato !== "L"); return r ? r.stato : ""; };
+      const cal = lez.length ? `<div class="tw"><table class="pcal"><thead><tr><th class="nm">Allievo</th>${lez.map(d => `<th><span>${GG[new Date(d + "T12:00").getDay()]}</span>${+d.slice(8)}</th>`).join("")}<th>Tot.</th></tr></thead><tbody>
+        ${nomi.map(n => { const v = lez.map(d => cella(n, d)); return `<tr><td class="nm">${esc(n)}</td>${v.map(x => `<td class="c ${x}">${x === "P" ? "●" : x === "A" ? "A" : x === "G" ? "G" : ""}</td>`).join("")}<td class="num"><b>${v.filter(x => x === "P").length}</b></td></tr>`; }).join("")}
+        <tr class="tot"><td class="nm">Presenti</td>${lez.map(d => `<td class="num">${mine.filter(x => x.data === d && x.stato === "P").length}</td>`).join("")}<td></td></tr></tbody></table></div>
+        <p class="note" style="margin:6px 0 0">● presente · A assente · G assenza giustificata</p>` : "";
+      cards.push(`<div class="card"><h2>${esc(c.nome)}</h2><p class="note" style="margin:-6px 0 10px">Lezioni tenute: <b>${lez.length}</b>${lez.length ? " · " + lez.map(d => +d.slice(8)).join(", ") : ""}</p>${cal}
+</div>`);
     });
     const ins = Object.keys(perIns).sort();
     return `<div class="stack"><div class="card"><div class="top2"><h2 style="margin:0">Riepilogo di ${meseNome(R.mese)}</h2>${sel}</div>

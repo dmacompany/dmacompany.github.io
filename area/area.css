@@ -94,3 +94,10 @@ html.app body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .ar .assf .full{grid-column:1/-1}
 @media (max-width:520px){.ar .pb{padding:8px 7px;min-width:0}.ar .assf{grid-template-columns:1fr}}
 .ar .tolgo{display:block;margin-top:4px;padding:0;background:none;border:0;font:inherit;font-size:12px;font-weight:600;color:var(--rose-d);text-decoration:underline;cursor:pointer}
+.ar .pcal{border-collapse:collapse;font-size:13px;min-width:100%}
+.ar .pcal th,.ar .pcal td{border:1px solid var(--line);padding:5px 6px;text-align:center;white-space:nowrap}
+.ar .pcal th{font-size:12px;font-weight:700;background:var(--bg)}.ar .pcal th span{display:block;font-size:10px;font-weight:600;color:var(--ink2);text-transform:capitalize}
+.ar .pcal .nm{text-align:left;position:sticky;left:0;background:var(--card);z-index:1;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.ar .pcal th.nm{background:var(--bg)}
+.ar .pcal td.P{color:var(--ok);font-size:15px}.ar .pcal td.A{color:var(--rose-d);font-weight:700;background:var(--rose-s)}.ar .pcal td.G{color:var(--warn);font-weight:700;background:var(--warn-s)}
+.ar .pcal tr.tot td{font-weight:700;font-size:13px;line-height:1.3;background:var(--bg)}

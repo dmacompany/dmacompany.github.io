@@ -45,14 +45,16 @@ function codeStep(){
   $("#cdBack").onclick=()=>{main.innerHTML=loginHtml;bindLogin();$("#em").value=S.email};
   $("#cdRe").onclick=async()=>{try{const j=await api({tipo:"area_codice",email:S.email});toast(j.ok?"Nuovo codice inviato":"Troppi codici richiesti: riprova più tardi")}catch(x){toast("Invio non riuscito")}};
 }
-function entra(j,k){S.t=j.t;store.set("ar.t",j.t);if(j.r||k)store.set("ar.r",j.r||k);S.D=j.dati;S.kid=(j.dati.soci[0]||{}).id;S.view="home";render();window.scrollTo(0,0)}
-function esci(){store.set("ar.t",null);store.set("ar.r",null);S.t=null;S.D=null;main.innerHTML=loginHtml;bindLogin();window.scrollTo(0,0)}
+function entra(j,k){S.t=j.t;store.set("ar.t",j.t);if(j.r||k)store.set("ar.r",j.r||k);tieniLink();S.D=j.dati;S.kid=(j.dati.soci[0]||{}).id;S.view="home";render();window.scrollTo(0,0)}
+/* il link personale resta nell'indirizzo: chi aggiunge la pagina alla schermata Home (anche su iPhone) apre l'app già collegato */
+function tieniLink(){const r=store.get("ar.r");try{if(r&&new URLSearchParams(location.search).get("k")!==r)history.replaceState(null,"",location.pathname+"?k="+encodeURIComponent(r))}catch(x){}}
+function esci(){store.set("ar.t",null);store.set("ar.r",null);S.t=null;try{history.replaceState(null,"",location.pathname)}catch(x){}S.D=null;main.innerHTML=loginHtml;bindLogin();window.scrollTo(0,0)}
 async function avvio(){
   bindLogin();if(!CONFIG.ENDPOINT)return;
   const qs=new URLSearchParams(location.search),k=qs.get("k");
-  if(k){history.replaceState(null,"",location.pathname);main.classList.add("wait");
+  if(k){main.classList.add("wait");
     try{const j=await api({tipo:"area_link",k});if(!j.ok)throw new Error(j.errore);main.classList.remove("wait");entra(j,k);return}
-    catch(x){main.classList.remove("wait");showMsg("<b>Questo link non è attivo.</b> Potrebbe essere stato sostituito da uno nuovo. Entra con la tua email qui sopra oppure chiedi un nuovo link su <a href='"+WA+"' style='white-space:nowrap;font-weight:700'>WhatsApp</a>.");return}}
+    catch(x){main.classList.remove("wait");try{history.replaceState(null,"",location.pathname)}catch(y){}showMsg("<b>Questo link non è attivo.</b> Potrebbe essere stato sostituito da uno nuovo. Entra con la tua email qui sopra oppure chiedi un nuovo link su <a href='"+WA+"' style='white-space:nowrap;font-weight:700'>WhatsApp</a>.");return}}
   if(S.t){main.classList.add("wait");try{const j=await api({tipo:"area_dati",t:S.t});main.classList.remove("wait");if(!j.ok)throw 0;S.D=j.dati;S.kid=(j.dati.soci[0]||{}).id;render();return}catch(x){main.classList.remove("wait");store.set("ar.t",null);S.t=null}}
   if(store.get("ar.r")){main.classList.add("wait");const ok=await riprendi();main.classList.remove("wait");if(ok){S.kid=(S.D.soci[0]||{}).id;render()}}
 }
