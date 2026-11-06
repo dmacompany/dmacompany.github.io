@@ -93,3 +93,4 @@ html.app body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .ar .assf input,.ar .assf select{font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
 .ar .assf .full{grid-column:1/-1}
 @media (max-width:520px){.ar .pb{padding:8px 7px;min-width:0}.ar .assf{grid-template-columns:1fr}}
+.ar .tolgo{display:block;margin-top:4px;padding:0;background:none;border:0;font:inherit;font-size:12px;font-weight:600;color:var(--rose-d);text-decoration:underline;cursor:pointer}

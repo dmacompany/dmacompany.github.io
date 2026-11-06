@@ -35,7 +35,7 @@
   function rigaAllievo(a) {
     const key = a.id || "n:" + a.nome, st = R.stato[key] || {}, s = st.s || "";
     const b = (v, l) => `<button type="button" class="pb ${v}${s === v ? " on" : ""}" data-r="set" data-k="${esc(key)}" data-v="${v}" aria-pressed="${s === v}">${l}</button>`;
-    return `<div class="prow"><div class="t"><b>${esc(a.nome)}</b>${s === "G" && st.nota ? `<span class="gnota">Avvisato: ${esc(st.nota)}</span>` : ""}${!a.id ? `<span>non in anagrafica</span>` : ""}</div>
+    return `<div class="prow"><div class="t"><b>${esc(a.nome)}</b>${s === "G" && st.nota ? `<span class="gnota">Avvisato: ${esc(st.nota)}</span>` : ""}${!a.id ? `<span>non in anagrafica</span>` : ""}${S.D.staff.ruolo === "admin" ? `<button type="button" class="tolgo" data-r="togli" data-k="${esc(key)}">${R.conf === key ? "Conferma: togli dal corso" : "Togli dal corso"}</button>` : ""}</div>
       <div class="pbs">${b("P", "Presente")}${b("A", "Assente")}${b("G", "Giustif.")}</div></div>`;
   }
   function rigaExtra(e, i) {
@@ -128,6 +128,15 @@
     const a = b.dataset.r;
     if (a === "set") { const k = b.dataset.k, cur = R.stato[k] || {}; R.stato[k] = { s: cur.s === b.dataset.v ? "" : b.dataset.v, nota: cur.nota || "" }; render(); }
     else if (a === "xset") { const x = R.extra[+b.dataset.i]; x.s = x.s === b.dataset.v ? "" : b.dataset.v; render(); }
+    else if (a === "togli") {
+      const k = b.dataset.k, c = corso();
+      if (R.conf !== k) { R.conf = k; render(); return; }
+      R.conf = null; b.disabled = true;
+      try { const j = await sess({ tipo: "staff_ritira", corso: c.id, chiave: k }); if (!j.ok) throw new Error(j.errore);
+        c.allievi = (c.allievi || []).filter(x => (x.id || "n:" + x.nome) !== k); delete R.stato[k]; toast("Tolto dal corso: AssoDesk lo aggiorna alla prossima lettura del registro"); }
+      catch (x) { if (x.message !== "sessione") toast("Non riuscito, riprova"); }
+      render();
+    }
     else if (a === "riga") { R.extra.push({ nome: "", s: "" }); render(); }
     else if (a === "tutti") { (corso().allievi || []).forEach(al => { const k = al.id || "n:" + al.nome; if (!R.stato[k] || !R.stato[k].s) R.stato[k] = { s: "P", nota: "" }; }); render(); }
     else if (a === "corso") { R.corso = b.dataset.id; R.carico = false; render(); }
