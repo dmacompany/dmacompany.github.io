@@ -77,6 +77,7 @@ function vHome(){const s=kid(),av=[],dv=dovuti(s);
   return `<div class="stack">${av.join("")}<div class="grid2">
    <div class="card"><h2>Iscrizione di ${esc(nomeP(s))}</h2><dl><dt>Stato</dt><dd><span class="pill ok">socio · stagione ${esc(S.D.stagione)}</span></dd>${s.tessera?`<dt>Tessera ACSI</dt><dd>${esc(s.tessera)}</dd>`:""}<dt>Certificato</dt><dd>${certTxt(s.cert)}${s.cert.scad?" "+fd(s.cert.scad):""}</dd></dl></div>
    <div class="card"><h2>Corsi</h2>${(s.corsi||[]).length?s.corsi.map(c=>`<div class="row"><div class="t"><b>${esc(c.area)}</b><span>${esc(c.corso)}</span></div></div>`).join(""):`<p class="note" style="margin:0">${s.esente?"Staff: nessuna quota dovuta.":"Nessun corso registrato."}</p>`}</div></div>
+   ${window.Reg?Reg.sociCard(s):""}
    ${(s.mesi||[]).some(m=>m.v)?`<div class="card"><h2>Quote della stagione</h2>${mesiGrid(s)}</div>`:""}</div>`}
 function vPag(){const s=kid(),caus="Quota "+(dovuti(s).map(m=>MESI[m.m]).join(" ")||"")+" "+s.nome;
   return `<div class="stack">
@@ -102,10 +103,10 @@ function vMe(){const t=S.D.titolare||{nome:S.D.nome};
    <div class="card"><h2>Chiedi una modifica</h2><p class="note" style="margin:0 0 8px">Dati da correggere o aggiornare? Scrivi qui e la segreteria li sistema.</p><textarea id="fReq" placeholder="Es. nuovo indirizzo, nuovo cellulare…"></textarea><div class="actions" style="margin-top:10px"><button class="btn small" data-a="sendReq">Invia la richiesta</button></div></div>
    <div class="actions"><button class="btn ghost" data-a="esci">Esci</button></div></div>`}
 const TABS=[["home","Panoramica",vHome],["pag","Pagamenti",vPag],["doc","Documenti",vDoc],["me","I miei dati",vMe]];
-function render(){if(!S.D)return;const tit=(S.D.titolare&&S.D.titolare.nome)||S.D.nome||"",first=(S.D.titolare&&S.D.titolare.saluto)||String(tit).split(" ").slice(1).join(" ")||tit;
+function render(){if(!S.D)return;if(window.Reg&&Reg.attivo()){Reg.renderStaff();return}const tit=(S.D.titolare&&S.D.titolare.nome)||S.D.nome||"",first=(S.D.titolare&&S.D.titolare.saluto)||String(tit).split(" ").slice(1).join(" ")||tit;
   if(!S.D.soci.length){main.innerHTML=`<div class="ar"><h1>Ciao ${esc(first)}</h1><div class="alert" style="margin-top:16px"><b>Nessun iscritto collegato</b>Scrivici su WhatsApp per completare l'attivazione.</div><div class="actions" style="margin-top:16px"><button class="btn ghost" data-a="esci">Esci</button></div></div>`;return}
   const v=TABS.find(t=>t[0]===S.view)||TABS[0];
-  main.innerHTML=`<div class="ar"><div class="top2"><div><div class="kick">Area riservata · stagione ${esc(S.D.stagione)}</div><h1>Ciao ${esc(first)}</h1></div><button class="btn ghost small" data-a="esci">Esci</button></div>
+  main.innerHTML=`<div class="ar"><div class="top2"><div><div class="kick">Area riservata · stagione ${esc(S.D.stagione)}</div><h1>Ciao ${esc(first)}</h1></div><div class="actions">${S.D.staff?`<button class="btn ghost small" data-r="socio">Registro</button>`:""}<button class="btn ghost small" data-a="esci">Esci</button></div></div>
   ${kidsBar()}<nav class="tabs" aria-label="Sezioni">${TABS.map(t=>`<button class="tab" data-a="go" data-id="${t[0]}" ${t[0]===v[0]?'aria-current="page"':""}>${t[1]}</button>`).join("")}</nav>${v[2]()}
   <p class="note" style="margin-top:20px;text-align:center">Dati aggiornati al ${esc(fd(String(S.D.agg).slice(0,10)))}. Per qualsiasi dubbio scrivici su <a href="${WA}" target="_blank" rel="noopener">WhatsApp 338 378 7702</a>.</p></div>`}
 
@@ -138,5 +139,6 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
   }});
 document.addEventListener("change",async e=>{const t=e.target;if(t.dataset&&t.dataset.a==="cons"&&S.D){const s=S.D.soci.find(x=>x.id===t.dataset.id);
   try{const j=await sess({tipo:"area_richiesta",genere:"immagini",socioId:s.id,valore:t.checked});if(!j.ok)throw 0;s.immagini=t.checked;toast(t.checked?"Consenso inviato: la segreteria lo registra":"Revoca inviata: la segreteria la registra")}catch(x){t.checked=!t.checked;toast("Invio non riuscito")}}});
+window.AR={S,main,sess,esc,toast,render,kid};
 avvio();
 })();

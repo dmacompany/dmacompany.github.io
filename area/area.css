@@ -63,3 +63,33 @@ html.app .top,html.app header .back,html.app .vialink{display:none}
 html.app header{padding-top:env(safe-area-inset-top,0px)}
 html.app .ar .tabs{top:env(safe-area-inset-top,0px)}
 html.app body{padding-bottom:env(safe-area-inset-bottom,0px)}
+
+/* Registro presenze */
+.ar .cchips{display:flex;gap:8px;flex-wrap:wrap}
+.ar .cchips .kid{padding:7px 14px}
+.ar .dsel{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--ink2)}
+.ar .dsel input,.ar .dsel select{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.ar .plist{margin-top:12px}
+.ar .prow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.ar .prow:first-child{border-top:0}
+.ar .prow .t{min-width:0;flex:1}.ar .prow .t b{display:block;font-weight:600}.ar .prow .t span{font-size:12.5px;color:var(--ink2)}
+.ar .prow .gnota{display:block;color:var(--warn)!important}
+.ar .prow.extra input{width:100%;font:inherit;font-size:14px;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.ar .pbs{display:flex;gap:4px;flex:none}
+.ar .pb{font:inherit;font-size:12px;font-weight:700;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink2);cursor:pointer;min-width:44px}
+.ar .pb.P.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.ar .pb.A.on{background:var(--rose);border-color:var(--rose);color:#fff}
+.ar .pb.G.on{background:var(--warn);border-color:var(--warn);color:#fff}
+.ar .savebar{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px 10px 16px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.12);z-index:15}
+.ar .tw{overflow-x:auto}
+.ar .ptab{width:100%;border-collapse:collapse;font-size:14px}
+.ar .ptab th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);padding:6px 8px;border-bottom:1px solid var(--line)}
+.ar .ptab td{padding:8px;border-bottom:1px solid var(--line)}
+.ar .ptab .num{text-align:right}
+.ar .pm{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;margin-top:12px}
+.ar .pm .mese span{display:block;text-transform:capitalize}.ar .pm .mese b{display:block;font-size:18px}
+.ar .assf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px}
+.ar .assf label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--ink2)}
+.ar .assf input,.ar .assf select{font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.ar .assf .full{grid-column:1/-1}
+@media (max-width:520px){.ar .pb{padding:8px 7px;min-width:0}.ar .assf{grid-template-columns:1fr}}

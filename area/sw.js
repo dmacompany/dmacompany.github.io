@@ -1,7 +1,7 @@
 /* Area soci DMA COMPANY – service worker: apre l'app anche con rete lenta.
    I dati personali non vengono mai salvati qui: passano solo le pagine e la grafica. */
-const V = "dma-area-v1";
-const SHELL = ["/area/", "/area/area.js?v=8", "/area/area.css?v=8", "/area/app.js?v=1", "/fonts/montserrat.css",
+const V = "dma-area-v2";
+const SHELL = ["/area/", "/area/area.js?v=9", "/area/area.css?v=9", "/area/registro.js?v=1", "/area/app.js?v=1", "/fonts/montserrat.css",
   "/fonts/montserrat-latin-400-normal.woff2", "/fonts/montserrat-latin-600-normal.woff2", "/fonts/montserrat-latin-700-normal.woff2",
   "/area/icon-192.png", "/area/apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
