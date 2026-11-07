@@ -117,3 +117,6 @@ html.app body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .ar .dtesto{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .ar .dtesto summary{cursor:pointer;font-weight:700;color:var(--rose,#E62C45)}
 .ar .dtesto .note p{margin:8px 0}.ar .dtesto ul{margin:4px 0 4px 18px;padding:0}.ar .dtesto li{margin:3px 0}
+.ar .paga2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.ar .paga2 .btn{width:100%;justify-content:center;text-align:center}
+@media (max-width:360px){.ar .paga2{grid-template-columns:1fr}}
