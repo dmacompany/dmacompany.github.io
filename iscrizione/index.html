@@ -40,7 +40,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rose);outline-of
 .err{border-color:var(--rose)!important;background:var(--rose-s)!important}
 .msg{font-size:13px;color:var(--rose-d);min-height:0}
 .opts{display:grid;gap:8px}
-.opt[hidden]{display:none!important}.opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--card)}
+.opt[hidden]{display:none!important}.sigbox{position:relative;border:1.5px dashed var(--line);border-radius:12px;background:#fff;height:170px;touch-action:none}.sigbox canvas{width:100%;height:100%;display:block;border-radius:12px;cursor:crosshair}.sigbox.err{border-color:#B4233A}.sigph{position:absolute;inset:0;display:grid;place-items:center;color:#b9b0b3;font-size:15px;pointer-events:none}.opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--card)}
 .opt:has(input:checked){border-color:var(--rose);background:var(--rose-s)}
 .opt input{margin-top:4px;accent-color:var(--rose);width:18px;height:18px;flex:none}
 .opt b{display:block;font-weight:600}.opt small{display:block;color:var(--ink2);font-size:13px}
@@ -208,6 +208,9 @@ footer{text-align:center;color:var(--ink2);font-size:12.5px;padding:0 16px 40px}
       </div>
       <div class="grid" style="margin-top:16px">
         <label class="f">Firma: nome e cognome di chi compila<input type="text" name="firma" required></label>
+        <div class="f full"><span>Firma qui con il dito (o con il mouse)</span>
+          <div class="sigbox"><canvas id="sig" aria-label="Riquadro per la firma"></canvas><span class="sigph" id="sigph">Firma qui</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span class="h">La firma viene riportata sulla domanda in PDF, con data e ora.</span><button type="button" class="btn ghost small" id="sigclr">Cancella</button></div></div>
         <label class="f">Data<input type="date" name="dataFirma" required readonly></label>
         <label class="f full">Note per la segreteria<span class="h">facoltativo: allergie, esigenze, domande</span><textarea name="note"></textarea></label>
       </div>
@@ -320,6 +323,7 @@ function valida(){const s=steps[cur],t=s.dataset.t;let ok=req(s),msg="";
     const e=eta();if(e!==null&&(e<2||e>100)){f.elements.a_nascita.classList.add("err");ok=false}}
   if(t==="Genitore"&&!checkCf(f.elements.g_cf))ok=false;
   if(t==="Corso"){if(!$$('input[name="corso"]:checked').length){msg="Scegli almeno un corso";ok=false}if(!tariffe().length){msg=msg||"Scegli la formula del corso";$("#tariffe").classList.add("err");ok=false}else $("#tariffe").classList.remove("err")}
+  if(t==="Firma"&&!SIG.ok){document.querySelector(".sigbox").classList.add("err");msg="Firma nel riquadro con il dito";ok=false}
   if(t==="Certificato"&&val("cert")==="allego"&&!files.cert){document.querySelector('[data-m="fCert"]').textContent="Allega il certificato oppure scegli di consegnarlo in segreteria";ok=false}
   if(!ok){let m=s.querySelector(".msg.step-msg");if(!m){m=document.createElement("p");m.className="msg step-msg";s.appendChild(m)}m.textContent=msg||"Completa i campi evidenziati";}
   else{const m=s.querySelector(".msg.step-msg");if(m)m.textContent=""}
@@ -334,13 +338,13 @@ function dati(){const fo=FORMULE.find(x=>x[0]===val("pag"))||FORMULE[1];
     pagamento:{formula:fo[0],scelta:fo[1],metodo:val("metodo")||"bonifico",causale:causale()},
     certificato:val("cert"),certScadenza:val("certScad"),
     consensi:{statuto:val("ok_statuto"),privacy:val("ok_privacy"),immagini:val("ok_immagini"),whatsapp:val("ok_whatsapp")},
-    firma:val("firma"),dataFirma:val("dataFirma"),note:val("note"),
+    firma:val("firma"),dataFirma:val("dataFirma"),firmaImg:SIG.ok?SIG.png():"",note:val("note"),
     fileCertificato:val("cert")==="allego"?files.cert:null}}
 function drawSum(){const d=dati(),r=(k,v)=>v?`<tr><td>${k}</td><td><b>${String(v).replace(/[<>&]/g,"")}</b></td></tr>`:"";
   $("#sum").innerHTML=r("Allievo",d.allievo.cognome+" "+d.allievo.nome)+r("Codice fiscale",d.allievo.cf)+r("Nato/a",fd(d.allievo.nascita)+" a "+d.allievo.luogoNascita)+r("Residenza",d.allievo.indirizzo+", "+d.allievo.cap+" "+d.allievo.citta)+r("Contatti",[d.allievo.cell,d.allievo.email].filter(Boolean).join(" · "))+
    (d.genitore?r("Genitore",d.genitore.cognome+" "+d.genitore.nome+" · "+d.genitore.cf)+r("Contatti genitore",d.genitore.cell+" · "+d.genitore.email):"")+
    r("Corsi",d.corso.area+": "+d.corso.corsi.join(", "))+r("Formula",d.corso.tariffa)+r("Inizio frequenza",fd(d.corso.inizio))+r("Pagamento",d.pagamento.scelta+" · "+(d.pagamento.metodo==="contanti"?"in segreteria":d.pagamento.metodo==="carta"?"carta, subito online":"bonifico"))+
-   r("Certificato",d.certificato==="allego"?"allegato"+(d.certScadenza?" · scade il "+fd(d.certScadenza):""):"lo consegno in segreteria")+r("Foto e video",d.consensi.immagini?"acconsento":"non acconsento")+r("WhatsApp",d.consensi.whatsapp?"acconsento":"non acconsento")+r("Firma",d.firma+" · "+fd(d.dataFirma))}
+   r("Certificato",d.certificato==="allego"?"allegato"+(d.certScadenza?" · scade il "+fd(d.certScadenza):""):"lo consegno in segreteria")+r("Foto e video",d.consensi.immagini?"acconsento":"non acconsento")+r("WhatsApp",d.consensi.whatsapp?"acconsento":"non acconsento")+r("Firma",d.firma+" · "+fd(d.dataFirma)+(d.firmaImg?" · firma grafica acquisita":""))}
 
 async function invia(){const b=$("#next"),es=$("#esito");const d=dati();es.classList.remove("hidden","ok","warn");
   if(!CONFIG.ENDPOINT){es.classList.add("warn");es.innerHTML="<b>Modulo in prova:</b> tutto corretto, ma la domanda non è stata inviata. Quando il modulo sarà attivo, arriverà alla segreteria con i documenti allegati.";return}
@@ -353,6 +357,16 @@ async function invia(){const b=$("#next"),es=$("#esito");const d=dati();es.class
 
 if(CONFIG.CARTA){const oc=$("#optCarta");if(oc){oc.hidden=false;const ic=oc.querySelector("input");let sv=null;try{sv=localStorage.getItem("dma.isc")}catch(x){}if(!sv)ic.checked=true}}
 (function(){const q=new URLSearchParams(location.search);if(q.get("pagato")||q.get("annullato")){const box=document.createElement("div");box.className="box";box.style.cssText="margin:0 0 16px;border-color:"+(q.get("pagato")?"#1E7A4C":"#B4233A");box.innerHTML=q.get("pagato")?"<b>Pagamento ricevuto, grazie!</b> La segreteria lo conferma e la ricevuta dell'associazione sarà disponibile entro 5 giorni nella tua area riservata.":"<b>Pagamento non completato.</b> Nessun addebito. Puoi pagare con bonifico o in segreteria: la segreteria ti scriverà su WhatsApp.";const m=document.querySelector("main")||document.body;m.insertBefore(box,m.firstChild);history.replaceState(null,"",location.pathname)}})();
+const SIG=(function(){const c=$("#sig"),box=c.parentNode,ph=$("#sigph"),o={ok:false};let ctx,draw=false,last=null;
+  function size(){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;if(!r.width)return;const img=o.ok?c.toDataURL():null;c.width=r.width*d;c.height=r.height*d;ctx=c.getContext("2d");ctx.scale(d,d);ctx.lineWidth=2.4;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#111";if(img){const i=new Image();i.onload=()=>ctx.drawImage(i,0,0,r.width,r.height);i.src=img}}
+  const pos=e=>{const r=c.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+  c.addEventListener("pointerdown",e=>{if(!ctx)size();draw=true;last=pos(e);c.setPointerCapture(e.pointerId);e.preventDefault()});
+  c.addEventListener("pointermove",e=>{if(!draw)return;const p=pos(e);ctx.beginPath();ctx.moveTo(last[0],last[1]);ctx.lineTo(p[0],p[1]);ctx.stroke();last=p;if(!o.ok){o.ok=true;ph.style.display="none";box.classList.remove("err")}e.preventDefault()});
+  ["pointerup","pointercancel","pointerleave"].forEach(t=>c.addEventListener(t,()=>{draw=false}));
+  $("#sigclr").onclick=()=>{if(ctx)ctx.clearRect(0,0,c.width,c.height);o.ok=false;ph.style.display=""};
+  window.addEventListener("resize",()=>{if(ctx)size()});new MutationObserver(()=>{if(!ctx||!c.width)size()}).observe(document.body,{attributes:true,subtree:true,attributeFilter:["class","hidden"]});
+  o.png=()=>{const w=600,h=Math.round(600*c.height/c.width),t=document.createElement("canvas");t.width=w;t.height=h;const x=t.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(c,0,0,w,h);return t.toDataURL("image/png").split(",")[1]};
+  return o})();
 $("#next").onclick=()=>{if(steps[cur].dataset.t==="Invio"){invia();return}if(!valida())return;const v=visibili();cur=steps.indexOf(v[v.indexOf(steps[cur])+1]);salva();show()};
 $("#prev").onclick=()=>{const v=visibili();const i=v.indexOf(steps[cur]);if(i>0){cur=steps.indexOf(v[i-1]);show()}};
 
