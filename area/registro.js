@@ -98,7 +98,7 @@
     const nome = S.D.nome || "", first = String(nome).split(" ")[0];
     const tabs = [["reg", "Registro"], ["riep", "Riepilogo"]];
     main.innerHTML = `<div class="ar"><div class="top2"><div><div class="kick">${S.D.staff.ruolo === "admin" ? "Segreteria" : "Area istruttori"} · stagione ${esc(S.D.stagione)}</div><h1>Ciao ${esc(first)}</h1></div>
-      <div class="actions">${S.D.soci.length ? `<button class="btn ghost small" data-r="socio">Area socio</button>` : ""}<button class="btn ghost small" data-a="esci">Esci</button></div></div>
+      <div class="actions">${S.D.staff.ruolo === "admin" ? `<a class="btn small" href="https://claude.ai/artifact/SRF5C4S43qhbRJQhzwS9Ur" target="_blank" rel="noopener">Apri AssoDesk</a>` : ""}${S.D.soci.length ? `<button class="btn ghost small" data-r="socio">Area socio</button>` : ""}<button class="btn ghost small" data-a="esci">Esci</button></div></div>
       <nav class="tabs" aria-label="Sezioni">${tabs.map(t => `<button class="tab" data-r="vista" data-id="${t[0]}" ${t[0] === R.vista ? 'aria-current="page"' : ""}>${t[1]}</button>`).join("")}</nav>
       ${R.vista === "riep" ? vRiep() : vReg()}</div>`;
     if (R.vista === "reg" && !R.carico && !R._loading) { R._loading = true; carica().finally(() => R._loading = false); }
