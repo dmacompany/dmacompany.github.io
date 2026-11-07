@@ -70,6 +70,9 @@ const ini=n=>String(n||"").split(" ").filter(Boolean).slice(0,2).map(x=>x[0]).jo
 const ava=(s,big)=>`<span class="av${big?" big":""}">${s.foto?`<img src="data:image/jpeg;base64,${s.foto}" alt="">`:esc(ini(s.nome))}</span>`;
 const nomeP=s=>s.nomeProprio||String(s.nome||"").split(" ").slice(1).join(" ")||s.nome;
 const dovuti=s=>(s.mesi||[]).filter(m=>m.s==="due");
+function heroAva(){const so=S.D.soci,k=kid();
+  if(so.length===1&&!so[0].minore)return `<button class="hero" data-a="go" data-id="me" title="La tua foto">${ava(so[0],1)}</button>`;
+  return `<div class="hero stack">${so.map(x=>`<button data-a="kid" data-id="${esc(x.id)}" class="${x.id===k.id?"sel":""}" title="${esc(nomeP(x))}">${ava(x,1)}</button>`).join("")}</div>`}
 function kidsBar(){const k=kid(),t=S.pdf&&S.pdf["T"+k.id];
   const tess=`<span class="tessbox">${t?`<a class="btn ghost small" href="${t.url}" target="_blank" rel="noopener">Apri la tessera</a>${t.share?`<button class="btn ghost small" data-a="pdfShare" data-id="T${esc(k.id)}">Condividi</button>`:`<button class="btn ghost small" data-a="pdfSave" data-id="T${esc(k.id)}">Scarica</button>`}`:`<button class="tess" data-a="tessera" title="Tessera ACSI di ${esc(nomeP(k))}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2.2"/><path d="M5.5 16.2c.7-1.6 1.8-2.4 3-2.4s2.3.8 3 2.4M14 10h4.5M14 13.5h3"/></svg>La mia tessera ACSI</button>`}</span>`;
   return `<div class="kids" role="group" aria-label="Allievo">${S.D.soci.length>1?S.D.soci.map(s=>`<button class="kid" data-a="kid" data-id="${esc(s.id)}" aria-pressed="${s.id===k.id}">${ava(s)}${esc(nomeP(s))}</button>`).join(""):""}${tess}</div>`}
@@ -152,7 +155,7 @@ const TABS=[["home","Panoramica",vHome],["pag","Pagamenti",vPag],["doc","Documen
 function render(){if(!S.D)return;if(window.Reg&&Reg.attivo()){Reg.renderStaff();return}const tit=(S.D.titolare&&S.D.titolare.nome)||S.D.nome||"",first=(S.D.titolare&&S.D.titolare.saluto)||String(tit).split(" ").slice(1).join(" ")||tit;
   if(!S.D.soci.length){main.innerHTML=`<div class="ar"><h1>Ciao ${esc(first)}</h1><div class="alert" style="margin-top:16px"><b>Nessun iscritto collegato</b>Scrivici su WhatsApp per completare l'attivazione.</div><div class="actions" style="margin-top:16px"><button class="btn ghost" data-a="esci">Esci</button></div></div>`;return}
   const v=TABS.find(t=>t[0]===S.view)||TABS[0];
-  main.innerHTML=`<div class="ar"><div class="top2"><div><div class="kick">Area riservata · stagione ${esc(S.D.stagione)}</div><h1>Ciao ${esc(first)}</h1></div><div class="actions">${S.D.staff?`<button class="btn ghost small" data-r="socio">Registro</button>`:""}<button class="btn ghost small" data-a="esci">Esci</button></div></div>
+  main.innerHTML=`<div class="ar"><div class="top2"><div class="hello">${heroAva()}<div><div class="kick">Area riservata · stagione ${esc(S.D.stagione)}</div><h1>Ciao ${esc(first)}</h1></div></div><div class="actions">${S.D.staff?`<button class="btn ghost small" data-r="socio">Registro</button>`:""}<button class="btn ghost small" data-a="esci">Esci</button></div></div>
   ${kidsBar()}<nav class="tabs" aria-label="Sezioni">${TABS.map(t=>`<button class="tab" data-a="go" data-id="${t[0]}" ${t[0]===v[0]?'aria-current="page"':""}>${t[1]}</button>`).join("")}</nav>${v[2]()}
   <p class="note" style="margin-top:20px;text-align:center">Dati aggiornati al ${esc(fd(String(S.D.agg).slice(0,10)))}. Per qualsiasi dubbio scrivici su <a href="${WA}" target="_blank" rel="noopener">WhatsApp 338 378 7702</a>.</p></div>`;initSig()}
 

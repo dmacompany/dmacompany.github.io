@@ -120,3 +120,12 @@ html.app body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .ar .paga2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .ar .paga2 .btn{width:100%;justify-content:center;text-align:center}
 @media (max-width:360px){.ar .paga2{grid-template-columns:1fr}}
+.ar .hello{display:flex;align-items:center;gap:14px;min-width:0}
+.ar .hero{border:0;background:none;padding:0;cursor:pointer;flex:none}
+.ar .hero .av.big{width:60px;height:60px;font-size:20px;box-shadow:0 0 0 3px var(--card),0 0 0 4px var(--line)}
+.ar .hero.stack{display:flex}
+.ar .hero.stack button{border:0;background:none;padding:0;cursor:pointer;margin-left:-14px;position:relative}
+.ar .hero.stack button:first-child{margin-left:0}
+.ar .hero.stack button.sel{z-index:2}
+.ar .hero.stack button.sel .av.big{box-shadow:0 0 0 3px var(--card),0 0 0 5px var(--rose)}
+.ar .hero.stack button:not(.sel) .av.big{width:48px;height:48px;font-size:16px;opacity:.85}
