@@ -7,23 +7,23 @@
   "scope": "/area/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0E0E10",
-  "theme_color": "#0E0E10",
+  "background_color": "#231F20",
+  "theme_color": "#231F20",
   "icons": [
     {
-      "src": "/area/icon-192.png?v=2",
+      "src": "/area/icon-192.png?v=3",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/area/icon-512.png?v=2",
+      "src": "/area/icon-512.png?v=3",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/area/icon-maskable-512.png?v=2",
+      "src": "/area/icon-maskable-512.png?v=3",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
