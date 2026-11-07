@@ -109,7 +109,6 @@ function vDomanda(s){const tit="Domanda di ammissione "+stagLunga(),d=s.domanda|
   const min=!!s.minore,chi=min?(s.genitore||""):s.nome;
   return `<div class="card" id="domCard"><h2>${esc(tit)}</h2><p class="note" style="margin:0 0 10px">Controlla i dati, metti le spunte e firma con il dito. Ricevi subito il PDF firmato anche per email.</p>
    <dl><dt>Allievo</dt><dd>${esc(s.nome)}</dd>${s.cf?`<dt>Codice fiscale</dt><dd class="mono">${esc(s.cf)}</dd>`:""}${s.nascita?`<dt>Nato/a</dt><dd>${esc(fd(s.nascita))}${s.luogo?" a "+esc(s.luogo):""}</dd>`:""}${s.residenza?`<dt>Residenza</dt><dd>${esc(s.residenza)}</dd>`:""}${min&&s.genitore?`<dt>Genitore</dt><dd>${esc(s.genitore)}</dd>`:""}</dl>
-   <div class="actions" style="margin-top:12px">${S.pdf&&S.pdf["A"+s.id]?`<a class="btn ghost small" href="${S.pdf["A"+s.id].url}" target="_blank" rel="noopener">Apri l'anteprima PDF</a>`:`<button class="btn ghost small" data-a="domPrev">Vedi il PDF prima di firmare</button>`}</div>
    <details class="dtesto"><summary>Leggi il testo della domanda</summary><div class="note">
     <p><b>Al Consiglio Direttivo di TinkerDance A.S.D.</b></p>
     <p>${min?`Il/la sottoscritto/a <b>${esc(s.genitore||"")}</b>, genitore o esercente la responsabilità genitoriale, <b>chiede</b> che il/la minore <b>${esc(s.nome)}</b> sia ammesso/a`:`Il/la sottoscritto/a <b>${esc(s.nome)}</b> <b>chiede</b> di essere ammesso/a`} quale socio/a dell'associazione per la stagione sportiva ${esc(stagLunga().replace("/"," - "))}.</p>
@@ -125,6 +124,7 @@ function vDomanda(s){const tit="Domanda di ammissione "+stagLunga(),d=s.domanda|
    <label class="switch"><div><b>Gruppo WhatsApp del corso</b><div class="note">Per avvisi e comunicazioni.</div></div><input type="checkbox" id="dWa" checked></label>
    <label class="switch"><div><b>Consenso a foto e video</b><div class="note">Uso su sito e social, senza nomi.</div></div><input type="checkbox" id="dImg" ${s.immagini?"checked":""}></label>
    <label class="note" style="display:block;margin-top:12px">Nome e cognome di chi firma${min?" (genitore)":""}<input id="dNome" value="${esc(chi)}" autocomplete="name"></label>
+   <div class="actions prevbox" style="margin-top:14px">${S.pdf&&S.pdf["A"+s.id]?`<a class="btn ghost small" href="${S.pdf["A"+s.id].url}" target="_blank" rel="noopener">Apri l'anteprima PDF</a>`:`<button class="btn ghost small" data-a="domPrev">Vedi il PDF prima di firmare</button>`}</div>
    <div class="note" style="margin:12px 0 6px">Firma qui con il dito</div>
    <div class="sigbox"><canvas id="asig"></canvas><div class="sigph" id="asigph">Firma qui</div></div>
    <div class="actions" style="justify-content:space-between;margin-top:10px"><button class="btn ghost small" data-a="sigClr">Cancella firma</button><button class="btn small" data-a="firma">Firma e invia</button></div></div>`}
@@ -200,7 +200,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
   }});
 function fotoRidotta(file){return new Promise((ok,ko)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{const n=320,c=document.createElement("canvas");c.width=c.height=n;const x=c.getContext("2d"),m=Math.min(im.width,im.height);x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,n,n);URL.revokeObjectURL(u);ok(c.toDataURL("image/jpeg",.85).split(",")[1])};im.onerror=()=>ko(new Error("img"));im.src=u})}
 document.addEventListener("change",async e=>{const t=e.target;if(!S.D)return;
-  if((t.id==="dWa"||t.id==="dImg")&&S.pdf){const k="A"+kid().id;if(S.pdf[k]){delete S.pdf[k];const box=document.querySelector("#domCard .actions");if(box)box.innerHTML=`<button class="btn ghost small" data-a="domPrev">Vedi il PDF prima di firmare</button>`}}
+  if((t.id==="dWa"||t.id==="dImg"||t.id==="dNome")&&S.pdf){const k="A"+kid().id;if(S.pdf[k]){delete S.pdf[k];const box=document.querySelector("#domCard .prevbox");if(box)box.innerHTML=`<button class="btn ghost small" data-a="domPrev">Vedi il PDF prima di firmare</button>`}}
   if(t.id==="fFoto"&&t.files&&t.files[0]){const s=kid();try{const b=await fotoRidotta(t.files[0]);toast("Caricamento della foto…");const j=await sess({tipo:"area_foto",socioId:s.id,azione:"carica",data:b});if(!j.ok)throw new Error(j.errore);s.foto=b;render();toast("Foto aggiornata: la vede anche l'istruttore nel registro")}catch(x){if(x.message!=="sessione")toast("Foto non caricata, prova con un'altra immagine")}return}
   if(t.dataset&&t.dataset.a==="fotoReg"){const s=kid();try{const j=await sess({tipo:"area_foto",socioId:s.id,azione:"registro",registro:t.checked});if(!j.ok)throw 0;s.fotoReg=t.checked;toast(t.checked?"La foto è di nuovo visibile all'istruttore":"Foto nascosta all'istruttore")}catch(x){t.checked=!t.checked;toast("Non riuscito, riprova")}return}
 });
