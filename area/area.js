@@ -109,6 +109,16 @@ function vDomanda(s){const tit="Domanda di ammissione "+stagLunga(),d=s.domanda|
   const min=!!s.minore,chi=min?(s.genitore||""):s.nome,corsi=(s.corsiReg||[]).map(c=>c.nome).concat((s.corsiReg||[]).length?[]:(s.corsi||[]).map(c=>c.corso)).filter(Boolean);
   return `<div class="card" id="domCard"><h2>${esc(tit)}</h2><p class="note" style="margin:0 0 10px">Controlla i dati, metti le spunte e firma con il dito. Ricevi subito il PDF firmato anche per email.</p>
    <dl><dt>Allievo</dt><dd>${esc(s.nome)}</dd>${s.cf?`<dt>Codice fiscale</dt><dd class="mono">${esc(s.cf)}</dd>`:""}${s.nascita?`<dt>Nato/a</dt><dd>${esc(fd(s.nascita))}${s.luogo?" a "+esc(s.luogo):""}</dd>`:""}${s.residenza?`<dt>Residenza</dt><dd>${esc(s.residenza)}</dd>`:""}${min&&s.genitore?`<dt>Genitore</dt><dd>${esc(s.genitore)}</dd>`:""}${corsi.length?`<dt>Corsi</dt><dd>${esc(corsi.join(", "))}</dd>`:""}</dl>
+   <details class="dtesto"><summary>Leggi il testo della domanda</summary><div class="note">
+    <p><b>Al Consiglio Direttivo di TinkerDance A.S.D.</b></p>
+    <p>${min?`Il/la sottoscritto/a <b>${esc(s.genitore||"")}</b>, genitore o esercente la responsabilità genitoriale, <b>chiede</b> che il/la minore <b>${esc(s.nome)}</b> sia ammesso/a`:`Il/la sottoscritto/a <b>${esc(s.nome)}</b> <b>chiede</b> di essere ammesso/a`} quale socio/a dell'associazione per la stagione sportiva ${esc(stagLunga().replace("/"," - "))} e tesserato/a all'ente di promozione sportiva ACSI, con la relativa copertura assicurativa${corsi.length?", per i corsi: "+esc(corsi.join(", ")):""}.</p>
+    <p>A tal fine dichiara:</p><ul>
+     <li>di aver preso visione dello Statuto e del Regolamento interno dell'associazione e di accettarli integralmente;</li>
+     <li>di impegnarsi al versamento della quota associativa annuale e delle quote di partecipazione alle attività;</li>
+     <li>di consegnare il certificato medico di idoneità all'attività sportiva non agonistica in corso di validità, senza il quale non è possibile frequentare;</li>
+     <li>di aver ricevuto e letto l'informativa sul trattamento dei dati personali;</li>
+     <li>che i dati indicati sono veritieri.</li></ul>
+    <p>Seguono i consensi scelti qui sotto e la firma. Il PDF completo, con l'informativa, arriva dopo la firma.</p></div></details>
    <p class="note" style="margin:8px 0 0">Dati da correggere? Scrivilo in “I miei dati” › Chiedi una modifica, poi firma.</p>
    <label class="switch"><div><b>Ho letto l'informativa privacy</b><div class="note">Obbligatorio. <a href="/privacy/" target="_blank" rel="noopener">Leggi l'informativa</a></div></div><input type="checkbox" id="dPriv"></label>
    <label class="switch"><div><b>Gruppo WhatsApp del corso</b><div class="note">Per avvisi e comunicazioni.</div></div><input type="checkbox" id="dWa" checked></label>
