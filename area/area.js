@@ -52,6 +52,8 @@ function esci(){store.set("ar.t",null);store.set("ar.r",null);S.t=null;try{histo
 async function avvio(){
   bindLogin();if(!CONFIG.ENDPOINT)return;
   const qs=new URLSearchParams(location.search),k=qs.get("k");
+  if(qs.get("pagato"))setTimeout(()=>toast("Pagamento ricevuto, grazie! La ricevuta sarà disponibile entro 5 giorni"),900);else if(qs.get("annullato"))setTimeout(()=>toast("Pagamento non completato: nessun addebito"),900);
+  if(qs.get("pagato")||qs.get("annullato"))try{history.replaceState(null,"",location.pathname+(k?"?k="+encodeURIComponent(k):""))}catch(x){}
   if(k){main.classList.add("wait");
     try{const j=await api({tipo:"area_link",k});if(!j.ok)throw new Error(j.errore);main.classList.remove("wait");entra(j,k);return}
     catch(x){main.classList.remove("wait");try{history.replaceState(null,"",location.pathname)}catch(y){}showMsg("<b>Questo link non è attivo.</b> Potrebbe essere stato sostituito da uno nuovo. Entra con la tua email qui sopra oppure chiedi un nuovo link su <a href='"+WA+"' style='white-space:nowrap;font-weight:700'>WhatsApp</a>.");return}}
@@ -84,8 +86,8 @@ function vHome(){const s=kid(),av=[],dv=dovuti(s);
 function vPag(){const s=kid(),caus="Quota "+(dovuti(s).map(m=>MESI[m.m]).join(" ")||"")+" "+s.nome;
   return `<div class="stack">
   ${s.daPagare>0?`<div class="card"><h2>Da pagare</h2><div class="row"><div class="t"><b>${dovuti(s).length?"Quota di "+esc(dovuti(s).map(m=>MESI[m.m]).join(", ")):"Quota"}${s.tess.dovuta>s.tess.pagata?" e quota associativa":""}</b><span>importo aggiornato al ${esc(fd(String(S.D.agg).slice(0,10)))}</span></div><span class="num">${eur(s.daPagare)}</span></div>
-   <div class="box" style="margin-top:10px"><dl><dt>Intestato a</dt><dd>${esc(S.D.intestatario)}</dd><dt>IBAN</dt><dd class="mono">${esc(String(S.D.iban).replace(/(.{4})/g,"$1 ").trim())}</dd><dt>Causale</dt><dd>${esc(caus.replace(/\s+/g," "))}</dd></dl>
-   <div class="actions" style="margin-top:12px"><button class="btn ghost small" data-a="copy" data-t="${esc(String(S.D.iban).replace(/\s/g,""))}">Copia IBAN</button><button class="btn ghost small" data-a="copy" data-t="${esc(caus.replace(/\s+/g," "))}">Copia causale</button></div></div>
+   ${S.D.carta?`<div class="actions" style="margin-top:12px"><button class="btn" data-a="paga">Paga con carta · ${eur(s.daPagare)}</button></div><p class="note" style="margin:8px 0 0">Pagamento sicuro con carta di credito o debito, Apple Pay o Google Pay. È tracciabile: vale per la detrazione.</p><details class="bonif" style="margin-top:12px"><summary>Preferisci il bonifico?</summary>`:""}<div class="box" style="margin-top:10px"><dl><dt>Intestato a</dt><dd>${esc(S.D.intestatario)}</dd><dt>IBAN</dt><dd class="mono">${esc(String(S.D.iban).replace(/(.{4})/g,"$1 ").trim())}</dd><dt>Causale</dt><dd>${esc(caus.replace(/\s+/g," "))}</dd></dl>
+   <div class="actions" style="margin-top:12px"><button class="btn ghost small" data-a="copy" data-t="${esc(String(S.D.iban).replace(/\s/g,""))}">Copia IBAN</button><button class="btn ghost small" data-a="copy" data-t="${esc(caus.replace(/\s+/g," "))}">Copia causale</button></div></div>${S.D.carta?"</details>":""}
    <p class="note" style="margin:10px 0 0">Puoi pagare anche in contanti in segreteria.</p></div>`:`<div class="alert ok"><b>Nessuna quota da pagare</b>${s.credito>0?"Hai già versato "+eur(s.credito)+" per i prossimi mesi.":"Sei in regola con i pagamenti."}</div>`}
   <div class="card"><h2>Hai fatto un bonifico?</h2><p class="note" style="margin:0 0 10px">Carica la ricevuta, anche uno screenshot dell'app della banca. La segreteria verifica l'accredito e la ricevuta dell'associazione compare qui entro 5 giorni.</p>
    <div class="drop"><input type="file" id="fRic" accept="image/*,application/pdf"><input type="text" id="fImp" inputmode="decimal" placeholder="Importo versato (€)"><input type="text" id="fNota" placeholder="Per quale mese (facoltativo)">
@@ -121,6 +123,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
     case"go":S.view=b.dataset.id;render();window.scrollTo(0,0);break;
     case"kid":S.kid=b.dataset.id;render();break;
     case"esci":esci();break;
+    case"paga":{const s=kid();b.disabled=true;b.textContent="Apertura del pagamento…";try{const j=await sess({tipo:"area_paga",socioId:s.id});if(!j.ok)throw new Error(j.errore);location.href=j.url;return}catch(x){if(x.message!=="sessione")toast(x.message==="nulla"?"Non risultano quote da pagare":"Pagamento con carta non disponibile ora: riprova o usa il bonifico")}b.disabled=false;b.textContent="Paga con carta";break}
     case"copy":try{await navigator.clipboard.writeText(b.dataset.t);toast("Copiato")}catch(x){toast(b.dataset.t)}break;
     case"pdf":{b.disabled=true;b.textContent="…";try{const j=await sess({tipo:"area_pdf",num:b.dataset.id});if(!j.ok)throw new Error(j.errore);
       const bin=atob(j.data),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);

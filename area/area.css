@@ -101,3 +101,4 @@ html.app body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .ar .pcal th.nm{background:var(--bg)}
 .ar .pcal td.P{color:var(--ok);font-size:15px}.ar .pcal td.A{color:var(--rose-d);font-weight:700;background:var(--rose-s)}.ar .pcal td.G{color:var(--warn);font-weight:700;background:var(--warn-s)}
 .ar .pcal tr.tot td{font-weight:700;font-size:13px;line-height:1.3;background:var(--bg)}
+.ar details.bonif summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--ink2)}.ar details.bonif[open] summary{margin-bottom:4px}
