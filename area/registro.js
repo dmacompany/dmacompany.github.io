@@ -140,7 +140,7 @@
       R.conf = null; b.disabled = true;
       try { const j = await sess({ tipo: "staff_ritira", corso: c.id, chiave: k }); if (!j.ok) throw new Error(j.errore);
         c.allievi = (c.allievi || []).filter(x => (x.id || "n:" + x.nome) !== k); delete R.stato[k]; toast("Tolto dal corso: AssoDesk lo aggiorna alla prossima lettura del registro"); }
-      catch (x) { if (x.message !== "sessione") toast("Non riuscito, riprova"); }
+      catch (x) { if (x.message === "tipo") toast("Funzione non ancora attiva: va pubblicata la nuova versione dello script"); else if (x.message !== "sessione") toast("Non riuscito (" + (x.message || "rete") + "), riprova"); }
       render();
     }
     else if (a === "riga") { R.extra.push({ nome: "", s: "" }); render(); }
