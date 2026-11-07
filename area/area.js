@@ -98,10 +98,38 @@ function vPag(){const s=kid(),caus="Quota "+(dovuti(s).map(m=>MESI[m.m]).join(" 
    <p class="note" style="margin:10px 0 0">Le ricevute pagate con mezzi tracciabili valgono per la detrazione delle spese sportive dei figli dai 5 ai 18 anni.</p></div>
   </div>`}
 function vDoc(){const s=kid(),c=s.cert;
-  return `<div class="stack"><div class="card"><h2>Certificato medico</h2><div class="row"><div class="t"><b>${esc(c.tipo)}</b><span>${c.scad?"Scadenza "+fd(c.scad):"Non ancora registrato"}</span></div>${certTxt(c)}</div>
+  return `<div class="stack">${vDomanda(s)}<div class="card"><h2>Certificato medico</h2><div class="row"><div class="t"><b>${esc(c.tipo)}</b><span>${c.scad?"Scadenza "+fd(c.scad):"Non ancora registrato"}</span></div>${certTxt(c)}</div>
    <div class="drop" style="margin-top:10px"><div class="note">${c.stato==="ok"?"Quando lo rinnovi, carica qui quello nuovo: foto o PDF.":"Carica il nuovo certificato: foto o PDF."}</div><input type="file" id="fCert" accept="image/*,application/pdf" style="margin-top:10px"><label class="note" style="display:block;margin-top:8px">Data di scadenza<input type="date" id="fScad"></label>
    <div class="actions" style="justify-content:center;margin-top:12px"><button class="btn small" data-a="sendCert">Invia il certificato</button></div></div></div>
-  <div class="card"><h2>Documenti</h2><p class="note" style="margin:0">Domanda di ammissione, tessera ACSI, statuto e informativa privacy: chiedili in segreteria o su <a href="${WA}" target="_blank" rel="noopener">WhatsApp</a>. Presto li troverai anche qui.</p></div></div>`}
+  <div class="card"><h2>Altri documenti</h2><p class="note" style="margin:0">Tessera ACSI: la trovi in Panoramica. Statuto e altri documenti: chiedili in segreteria o su <a href="${WA}" target="_blank" rel="noopener">WhatsApp</a>. L'informativa privacy è <a href="/privacy/" target="_blank" rel="noopener">qui</a>.</p></div></div>`}
+function stagLunga(){const m=String(S.D.stagione||"").match(/(\d{4})\D+(\d{2,4})/);return m?m[1]+"/"+(m[2].length===2?m[1].slice(0,2)+m[2]:m[2]):String(S.D.stagione||"")}
+function vDomanda(s){const tit="Domanda di ammissione "+stagLunga(),d=s.domanda||{},f=S.pdf&&S.pdf["D"+s.id];
+  if(d.firmata)return `<div class="card"><h2>${esc(tit)}</h2><div class="row"><div class="t"><b>Firmata il ${esc(d.data||"")}</b><span>da ${esc(d.da||"")}</span></div><span class="pill ok">firmata</span></div>
+   <div class="actions" style="margin-top:10px">${f?`<a class="btn ghost small" href="${f.url}" target="_blank" rel="noopener">Apri</a>${f.share?`<button class="btn ghost small" data-a="pdfShare" data-id="D${esc(s.id)}">Condividi</button>`:`<button class="btn ghost small" data-a="pdfSave" data-id="D${esc(s.id)}">Scarica</button>`}`:`<button class="btn ghost small" data-a="domPdf">Apri il PDF</button>`}</div></div>`;
+  const min=!!s.minore,chi=min?(s.genitore||""):s.nome,corsi=(s.corsiReg||[]).map(c=>c.nome).concat((s.corsiReg||[]).length?[]:(s.corsi||[]).map(c=>c.corso)).filter(Boolean);
+  return `<div class="card" id="domCard"><h2>${esc(tit)}</h2><p class="note" style="margin:0 0 10px">Controlla i dati, metti le spunte e firma con il dito. Ricevi subito il PDF firmato anche per email.</p>
+   <dl><dt>Allievo</dt><dd>${esc(s.nome)}</dd>${s.cf?`<dt>Codice fiscale</dt><dd class="mono">${esc(s.cf)}</dd>`:""}${s.nascita?`<dt>Nato/a</dt><dd>${esc(fd(s.nascita))}${s.luogo?" a "+esc(s.luogo):""}</dd>`:""}${s.residenza?`<dt>Residenza</dt><dd>${esc(s.residenza)}</dd>`:""}${min&&s.genitore?`<dt>Genitore</dt><dd>${esc(s.genitore)}</dd>`:""}${corsi.length?`<dt>Corsi</dt><dd>${esc(corsi.join(", "))}</dd>`:""}</dl>
+   <p class="note" style="margin:8px 0 0">Dati da correggere? Scrivilo in “I miei dati” › Chiedi una modifica, poi firma.</p>
+   <label class="switch"><div><b>Ho letto l'informativa privacy</b><div class="note">Obbligatorio. <a href="/privacy/" target="_blank" rel="noopener">Leggi l'informativa</a></div></div><input type="checkbox" id="dPriv"></label>
+   <label class="switch"><div><b>Gruppo WhatsApp del corso</b><div class="note">Per avvisi e comunicazioni.</div></div><input type="checkbox" id="dWa" checked></label>
+   <label class="switch"><div><b>Consenso a foto e video</b><div class="note">Uso su sito e social, senza nomi.</div></div><input type="checkbox" id="dImg" ${s.immagini?"checked":""}></label>
+   <label class="note" style="display:block;margin-top:12px">Nome e cognome di chi firma${min?" (genitore)":""}<input id="dNome" value="${esc(chi)}" autocomplete="name"></label>
+   <div class="note" style="margin:12px 0 6px">Firma qui con il dito</div>
+   <div class="sigbox"><canvas id="asig"></canvas><div class="sigph" id="asigph">Firma qui</div></div>
+   <div class="actions" style="justify-content:space-between;margin-top:10px"><button class="btn ghost small" data-a="sigClr">Cancella firma</button><button class="btn small" data-a="firma">Firma e invia</button></div></div>`}
+let SIGA=null;
+function initSig(){const c=document.getElementById("asig");if(!c){SIGA=null;return}const ph=document.getElementById("asigph"),box=c.parentNode,o={ok:false};let ctx,draw=false,last=null;
+  const r=c.getBoundingClientRect(),dp=window.devicePixelRatio||1;c.width=r.width*dp;c.height=r.height*dp;ctx=c.getContext("2d");ctx.scale(dp,dp);ctx.lineWidth=2.4;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#111";
+  const pos=e=>{const q=c.getBoundingClientRect();return[e.clientX-q.left,e.clientY-q.top]};
+  c.addEventListener("pointerdown",e=>{draw=true;last=pos(e);c.setPointerCapture(e.pointerId);e.preventDefault()});
+  c.addEventListener("pointermove",e=>{if(!draw)return;const p=pos(e);ctx.beginPath();ctx.moveTo(last[0],last[1]);ctx.lineTo(p[0],p[1]);ctx.stroke();last=p;if(!o.ok){o.ok=true;ph.style.display="none";box.classList.remove("err")}e.preventDefault()});
+  ["pointerup","pointercancel","pointerleave"].forEach(t=>c.addEventListener(t,()=>{draw=false}));
+  o.clr=()=>{ctx.clearRect(0,0,c.width,c.height);o.ok=false;ph.style.display=""};
+  o.png=()=>{const w=600,h=Math.round(600*c.height/c.width),t=document.createElement("canvas");t.width=w;t.height=h;const x=t.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(c,0,0,w,h);return t.toDataURL("image/png").split(",")[1]};
+  SIGA=o}
+function pdfBlob(b64,nome,key){const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);const blob=new Blob([u],{type:"application/pdf"});
+  let share=false;try{share=!!(navigator.canShare&&navigator.canShare({files:[new File([blob],nome,{type:"application/pdf"})]}))}catch(x){}
+  S.pdf=S.pdf||{};S.pdf[key]={blob,nome,url:URL.createObjectURL(blob),share}}
 function vMe(){const t=S.D.titolare||{nome:S.D.nome};
   return `<div class="stack">${[kid()].map(s=>`<div class="card"><div class="fotobox">${ava(s,1)}<div><h2 style="margin:0 0 8px">${esc(s.nome)}</h2><div class="actions"><label class="btn small" for="fFoto">${s.foto?"Cambia la foto":"Metti una foto"}</label>${s.foto?`<button class="btn ghost small" data-a="fotoDel">Togli</button>`:""}</div><input type="file" id="fFoto" accept="image/*" hidden></div></div>
     
@@ -115,7 +143,7 @@ function render(){if(!S.D)return;if(window.Reg&&Reg.attivo()){Reg.renderStaff();
   const v=TABS.find(t=>t[0]===S.view)||TABS[0];
   main.innerHTML=`<div class="ar"><div class="top2"><div><div class="kick">Area riservata · stagione ${esc(S.D.stagione)}</div><h1>Ciao ${esc(first)}</h1></div><div class="actions">${S.D.staff?`<button class="btn ghost small" data-r="socio">Registro</button>`:""}<button class="btn ghost small" data-a="esci">Esci</button></div></div>
   ${kidsBar()}<nav class="tabs" aria-label="Sezioni">${TABS.map(t=>`<button class="tab" data-a="go" data-id="${t[0]}" ${t[0]===v[0]?'aria-current="page"':""}>${t[1]}</button>`).join("")}</nav>${v[2]()}
-  <p class="note" style="margin-top:20px;text-align:center">Dati aggiornati al ${esc(fd(String(S.D.agg).slice(0,10)))}. Per qualsiasi dubbio scrivici su <a href="${WA}" target="_blank" rel="noopener">WhatsApp 338 378 7702</a>.</p></div>`}
+  <p class="note" style="margin-top:20px;text-align:center">Dati aggiornati al ${esc(fd(String(S.D.agg).slice(0,10)))}. Per qualsiasi dubbio scrivici su <a href="${WA}" target="_blank" rel="noopener">WhatsApp 338 378 7702</a>.</p></div>`;initSig()}
 
 /* ---------- file e invii ---------- */
 function leggiFile(inp){return new Promise((ok,ko)=>{const f=inp&&inp.files&&inp.files[0];if(!f)return ok(null);if(f.size>8*1024*1024)return ko(new Error("grande"));
@@ -142,6 +170,17 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
       catch(x){b.disabled=false;b.innerHTML=old;if(x.message!=="sessione")toast(x.message==="non_ancora"?"La tessera di "+nomeP(k)+" non è ancora disponibile: la carichiamo appena arriva da ACSI":"Tessera non disponibile, riprova")}break}
     case"pdfShare":{const f=S.pdf&&S.pdf[b.dataset.id];if(!f)break;try{await navigator.share({files:[new File([f.blob],f.nome,{type:"application/pdf"})],title:f.nome})}catch(x){}break}
     case"pdfSave":{const f=S.pdf&&S.pdf[b.dataset.id];if(!f)break;const l=document.createElement("a");l.href=f.url;l.download=f.nome;document.body.appendChild(l);l.click();l.remove();break}
+    case"sigClr":if(SIGA)SIGA.clr();break;
+    case"firma":{const s=kid(),nome=$("#dNome").value.trim();
+      if(!$("#dPriv").checked){toast("Spunta la presa visione dell'informativa privacy");break}
+      if(nome.length<4){toast("Scrivi nome e cognome di chi firma");$("#dNome").focus();break}
+      if(!SIGA||!SIGA.ok){document.querySelector("#domCard .sigbox").classList.add("err");toast("Firma nel riquadro con il dito");break}
+      b.disabled=true;b.textContent="Invio…";
+      try{const j=await sess({tipo:"area_firma",socioId:s.id,privacy:true,whatsapp:$("#dWa").checked,immagini:$("#dImg").checked,firma:nome,firmaImg:SIGA.png()});if(!j.ok)throw new Error(j.errore);
+        s.domanda={firmata:true,data:j.data,da:nome};pdfBlob(j.pdf,j.nome,"D"+s.id);render();toast("Domanda firmata e inviata: grazie!")}
+      catch(x){b.disabled=false;b.textContent="Firma e invia";if(x.message!=="sessione")toast(x.message==="firma"?"Firma non valida: rifalla più grande":"Invio non riuscito, riprova")}break}
+    case"domPdf":{const s=kid();b.disabled=true;b.textContent="Un momento…";try{const j=await sess({tipo:"area_domanda",socioId:s.id});if(!j.ok)throw new Error(j.errore);pdfBlob(j.data,j.nome,"D"+s.id);render()}
+      catch(x){b.disabled=false;b.textContent="Apri il PDF";if(x.message!=="sessione")toast("PDF non disponibile, riprova")}break}
     case"sendRic":invio(b,async()=>{const f=await leggiFile($("#fRic"));if(!f)throw new Error("nofile");const j=await sess({tipo:"area_file",genere:"contabile",socioId:kid().id,file:f,importo:$("#fImp").value,descr:$("#fNota").value});if(!j.ok)throw new Error(j.errore)},"Ricevuta inviata: la segreteria verifica l'accredito");break;
     case"sendCert":invio(b,async()=>{const f=await leggiFile($("#fCert"));if(!f)throw new Error("nofile");const j=await sess({tipo:"area_file",genere:"certificato",socioId:kid().id,file:f,scadenza:$("#fScad").value,descr:"Certificato medico"});if(!j.ok)throw new Error(j.errore)},"Certificato inviato alla segreteria");break;
     case"sendReq":{const t=$("#fReq").value.trim();if(!t){toast("Scrivi cosa modificare");break}invio(b,async()=>{const j=await sess({tipo:"area_richiesta",testo:t});if(!j.ok)throw new Error(j.errore)},"Richiesta inviata alla segreteria");break}

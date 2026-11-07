@@ -107,3 +107,10 @@ html.app body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .ar .fotobox{display:flex;gap:16px;align-items:center}
 .ar label.btn{cursor:pointer}
 .ar .pfoto{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
+
+.ar .sigbox{position:relative;border:1.5px dashed var(--line);border-radius:12px;background:#fff;height:170px;touch-action:none}
+.ar .sigbox canvas{width:100%;height:100%;display:block;border-radius:12px;cursor:crosshair}
+.ar .sigbox.err{border-color:#B4233A}
+.ar .sigph{position:absolute;inset:0;display:grid;place-items:center;color:#b9b0b3;font-size:15px;pointer-events:none}
+.ar label.switch{cursor:pointer}
+.ar #dNome{display:block;width:100%;margin-top:6px;font:inherit;font-size:16px;color:var(--ink);padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card,#fff)}
