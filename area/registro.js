@@ -21,6 +21,7 @@
     try {
       const j = await sess({ tipo: "staff_registro", corso: c.id, data: R.data });
       if (!j.ok) throw new Error(j.errore);
+      R.foto = j.foto || {};
       const ids = new Set((c.allievi || []).map(a => a.id || "n:" + a.nome));
       j.righe.forEach(r => {
         const key = r.socio || "n:" + r.nominativo;
@@ -35,7 +36,7 @@
   function rigaAllievo(a) {
     const key = a.id || "n:" + a.nome, st = R.stato[key] || {}, s = st.s || "";
     const b = (v, l) => `<button type="button" class="pb ${v}${s === v ? " on" : ""}" data-r="set" data-k="${esc(key)}" data-v="${v}" aria-pressed="${s === v}">${l}</button>`;
-    return `<div class="prow"><div class="t"><b>${esc(a.nome)}</b>${s === "G" && st.nota ? `<span class="gnota">Avvisato: ${esc(st.nota)}</span>` : ""}${!a.id ? `<span>non in anagrafica</span>` : ""}${S.D.staff.ruolo === "admin" ? `<button type="button" class="tolgo" data-r="togli" data-k="${esc(key)}">${R.conf === key ? "Conferma: togli dal corso" : "Togli dal corso"}</button>` : ""}</div>
+    return `<div class="prow">${R.foto && R.foto[a.id] ? `<img class="pfoto" src="data:image/jpeg;base64,${R.foto[a.id]}" alt="">` : ""}<div class="t"><b>${esc(a.nome)}</b>${s === "G" && st.nota ? `<span class="gnota">Avvisato: ${esc(st.nota)}</span>` : ""}${!a.id ? `<span>non in anagrafica</span>` : ""}${S.D.staff.ruolo === "admin" ? `<button type="button" class="tolgo" data-r="togli" data-k="${esc(key)}">${R.conf === key ? "Conferma: togli dal corso" : "Togli dal corso"}</button>` : ""}</div>
       <div class="pbs">${b("P", "Presente")}${b("A", "Assente")}${b("G", "Giustif.")}</div></div>`;
   }
   function rigaExtra(e, i) {
