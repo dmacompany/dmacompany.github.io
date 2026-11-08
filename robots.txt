@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /area/
+Disallow: /registro/
+Disallow: /anteprima/
+Sitemap: https://dmacompany.it/sitemap.xml
