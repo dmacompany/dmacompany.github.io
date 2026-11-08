@@ -174,6 +174,7 @@ function vMe(){const t=S.D.titolare||{nome:S.D.nome};
     <dl style="margin-top:14px">${s.cf?`<dt>Codice fiscale</dt><dd class="mono">${esc(s.cf)}</dd>`:""}${s.nascita?`<dt>Nato/a</dt><dd>${esc(fd(s.nascita))}${s.luogo?" a "+esc(s.luogo):""}</dd>`:""}${s.genitore?`<dt>Genitore</dt><dd>${esc(s.genitore)}</dd>`:""}${s.residenza?`<dt>Residenza</dt><dd>${esc(s.residenza)}</dd>`:""}${s.tel?`<dt>Cellulare</dt><dd>${esc(s.tel)}</dd>`:""}${s.email?`<dt>Email</dt><dd>${esc(s.email)}</dd>`:""}</dl>
     <div class="switch" style="margin-top:12px"><div><b>Consenso a foto e video</b><div class="note">Uso su sito e social di DMA COMPANY e TinkerDance, senza nomi. Puoi cambiarlo quando vuoi.</div></div><input type="checkbox" role="switch" data-a="cons" data-id="${esc(s.id)}" ${s.immagini?"checked":""} aria-label="Consenso foto e video di ${esc(s.nome)}"></div></div>`).join("")}
    <div class="card"><h2>Chiedi una modifica</h2><p class="note" style="margin:0 0 8px">Dati da correggere o aggiornare? Scrivi qui e la segreteria li sistema.</p><textarea id="fReq" placeholder="Es. nuovo indirizzo, nuovo cellulare…"></textarea><div class="actions" style="margin-top:10px"><button class="btn small" data-a="sendReq">Invia la richiesta</button></div></div>
+   ${window.DMAInst&&!document.documentElement.classList.contains("app")&&!(window.DMAInstallata&&window.DMAInstallata())?`<div class="card" id="instCard"><h2>App ${esc((document.querySelector('meta[name="apple-mobile-web-app-title"]')||{}).content||"DMA Soci")}</h2><p class="note" style="margin:0 0 10px">Metti l'area riservata sulla schermata Home del telefono: si apre con un tocco, senza rientrare ogni volta.</p><button class="btn" data-a="inst">Installa l'app</button></div>`:""}
    <div class="actions"><button class="btn ghost" data-a="esci">Esci</button></div></div>`}
 const TABS=[["home","Panoramica",vHome],["pag","Pagamenti",vPag],["doc","Documenti",vDoc],["me","I miei dati",vMe]];
 function render(){if(!S.D)return;if(window.Reg&&Reg.attivo()){Reg.renderStaff();return}const tit=(S.D.titolare&&S.D.titolare.nome)||S.D.nome||"",first=(S.D.titolare&&S.D.titolare.saluto)||String(tit).split(" ").slice(1).join(" ")||tit;
@@ -209,6 +210,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
     case"pdfShare":{const f=S.pdf&&S.pdf[b.dataset.id];if(!f)break;try{await navigator.share({files:[new File([f.blob],f.nome,{type:"application/pdf"})],title:f.nome})}catch(x){}break}
     case"pdfSave":{const f=S.pdf&&S.pdf[b.dataset.id];if(!f)break;const l=document.createElement("a");l.href=f.url;l.download=f.nome;document.body.appendChild(l);l.click();l.remove();break}
     case"bonif":S.bon=!S.bon;render();break;
+    case"inst":if(window.DMAInst)window.DMAInst();break;
     case"sigClr":if(SIGA)SIGA.clr();break;
     case"firma":{const s=kid(),R=domDati(s),nome=R.firma,er=domErr(s,R);
       if(er){toast(er);break}
