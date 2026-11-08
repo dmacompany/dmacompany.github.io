@@ -106,44 +106,53 @@ function vDoc(){const s=kid(),c=s.cert;
    <div class="actions" style="justify-content:center;margin-top:12px"><button class="btn small" data-a="sendCert">Invia il certificato</button></div></div></div>
   <div class="card"><h2>Altri documenti</h2><p class="note" style="margin:0">Tessera ACSI: la trovi in Panoramica. Statuto e altri documenti: chiedili in segreteria o su <a href="${WA}" target="_blank" rel="noopener">WhatsApp</a>. L'informativa privacy è <a href="/privacy/" target="_blank" rel="noopener">qui</a>.</p></div></div>`}
 function stagLunga(){const m=String(S.D.stagione||"").match(/(\d{4})\D+(\d{2,4})/);return m?m[1]+"/"+(m[2].length===2?m[1].slice(0,2)+m[2]:m[2]):String(S.D.stagione||"")}
-function domForm(s){S.df=S.df||{};if(!S.df[s.id]){const g=String(s.genitore||"").replace(/\s*[–-]\s*C\.?F\.?.*$/i,"").trim().split(/\s+/);
-  S.df[s.id]={g_ruolo:"genitore",g_cognome:g[0]||"",g_nome:g.slice(1).join(" "),g_cf:s.genitoreCf||"",g_cell:s.tel||"",g_email:s.email||""}}return S.df[s.id]}
-function domDati(s){const F=domForm(s),cf=x=>String(x||"").replace(/\s/g,"").toUpperCase(),r={al:{cf:cf(F.al_cf),nascita:F.al_nascita||"",luogo:(F.al_luogo||"").trim(),residenza:(F.al_residenza||"").trim()}};
-  if(s.minore)r.gen={ruolo:F.g_ruolo==="tutore"?"tutore":"genitore",cognome:(F.g_cognome||"").trim(),nome:(F.g_nome||"").trim(),cf:cf(F.g_cf),nascita:F.g_nascita||"",luogo:(F.g_luogo||"").trim(),residenza:(F.g_residenza||"").trim(),cell:(F.g_cell||"").trim(),email:(F.g_email||"").trim()};
-  r.firma=s.minore?(r.gen.cognome+" "+r.gen.nome).trim():String(F.firma!=null?F.firma:s.nome).trim();return r}
-function domErr(s,r){const ok=x=>/^[A-Z0-9]{16}$/.test(x);
-  if(!s.cf&&!ok(r.al.cf))return"Scrivi il codice fiscale dell'allievo (16 caratteri)";if(!s.nascita&&!r.al.nascita)return"Indica la data di nascita dell'allievo";if(!s.luogo&&!r.al.luogo)return"Indica il luogo di nascita dell'allievo";if(!s.residenza&&r.al.residenza.length<8)return"Scrivi la residenza dell'allievo";
-  if(r.gen){if(!r.gen.cognome||!r.gen.nome)return"Scrivi cognome e nome del genitore o tutore";if(!ok(r.gen.cf))return"Scrivi il codice fiscale del genitore o tutore (16 caratteri)"}
-  if(r.firma.length<4)return"Scrivi nome e cognome di chi firma";return""}
+function etaDa(n){const m=String(n||"").match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return null;const t=new Date();let a=t.getFullYear()-m[1];if(t.getMonth()+1<+m[2]||(t.getMonth()+1==+m[2]&&t.getDate()<+m[3]))a--;return a}
+function domForm(s){S.df=S.df||{};if(!S.df[s.id]){const g=String(s.genitore||"").replace(/\s*[–-]\s*C\.?F\.?.*$/i,"").trim().split(/\s+/),min=!!s.minore;
+  const cg=s.cognome||String(s.nome||"").split(" ")[0]||"",nm=s.nomeProprio||String(s.nome||"").split(" ").slice(1).join(" ");
+  S.df[s.id]={al_cognome:cg,al_nome:nm,al_cf:s.cf||"",al_nascita:String(s.nascita||"").slice(0,10),al_luogo:s.luogo||"",al_residenza:s.residenza||"",al_cell:min?"":(s.tel||""),al_email:min?"":(s.email||""),
+   g_ruolo:"genitore",g_cognome:g[0]||"",g_nome:g.slice(1).join(" "),g_cf:s.genitoreCf||"",g_cell:min?(s.tel||""):"",g_email:min?(s.email||""):""}}return S.df[s.id]}
+function domMin(s){const e=etaDa(domForm(s).al_nascita);return e===null?!!s.minore:e<18}
+function domDati(s){const F=domForm(s),T=x=>String(x||"").trim(),cf=x=>String(x||"").replace(/\s/g,"").toUpperCase(),min=domMin(s),e=etaDa(F.al_nascita),grande=!min||(e!==null&&e>=16);
+  const r={al:{cognome:T(F.al_cognome),nome:T(F.al_nome),cf:cf(F.al_cf),nascita:F.al_nascita||"",luogo:T(F.al_luogo),residenza:T(F.al_residenza),cell:grande?T(F.al_cell):"",email:grande?T(F.al_email):""}};
+  if(min)r.gen={ruolo:F.g_ruolo==="tutore"?"tutore":"genitore",cognome:T(F.g_cognome),nome:T(F.g_nome),cf:cf(F.g_cf),nascita:F.g_nascita||"",luogo:T(F.g_luogo),residenza:T(F.g_residenza),cell:T(F.g_cell),email:T(F.g_email)};
+  r.firma=min?(r.gen.cognome+" "+r.gen.nome).trim():(r.al.cognome+" "+r.al.nome).trim();return r}
+function domErr(s,r){const ok=x=>/^[A-Z0-9]{16}$/.test(x),em=x=>!x||/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x);
+  if(!r.al.cognome||!r.al.nome)return"Scrivi cognome e nome dell'allievo";if(!ok(r.al.cf))return"Scrivi il codice fiscale dell'allievo (16 caratteri)";
+  if(!r.al.nascita)return"Indica la data di nascita dell'allievo";if(!r.al.luogo)return"Indica il luogo di nascita dell'allievo";if(r.al.residenza.length<8)return"Scrivi la residenza dell'allievo";
+  if(!r.gen&&!r.al.cell&&!r.al.email)return"Indica almeno cellulare o email";if(!em(r.al.email))return"Controlla l'email dell'allievo";
+  if(r.gen){if(!r.gen.cognome||!r.gen.nome)return"Scrivi cognome e nome del genitore o tutore";if(!ok(r.gen.cf))return"Scrivi il codice fiscale del genitore o tutore (16 caratteri)";
+   if(!r.gen.cell&&!r.gen.email)return"Indica cellulare o email del genitore o tutore";if(!em(r.gen.email))return"Controlla l'email del genitore o tutore"}
+  return""}
+function domToggle(){const s=kid();if(!s||!document.getElementById("domCard"))return;const min=domMin(s),e=etaDa(domForm(s).al_nascita),q=x=>document.getElementById(x);
+  if(q("dGen"))q("dGen").hidden=!min;if(q("dRec"))q("dRec").hidden=min&&!(e!==null&&e>=16);if(q("dRecT"))q("dRecT").textContent=min?"Recapiti del ragazzo o della ragazza (facoltativi, dai 16 anni)":"Recapiti";}
 function vDomanda(s){const tit="Domanda di ammissione "+stagLunga(),d=s.domanda||{},f=S.pdf&&S.pdf["D"+s.id];
   if(d.firmata)return `<div class="card"><h2>${esc(tit)}</h2><div class="row"><div class="t"><b>Firmata il ${esc(d.data||"")}</b><span>da ${esc(d.da||"")}</span></div><span class="pill ok">firmata</span></div>
    <div class="actions" style="margin-top:10px">${f?`<a class="btn ghost small" href="${f.url}" target="_blank" rel="noopener">Apri</a>${f.share?`<button class="btn ghost small" data-a="pdfShare" data-id="D${esc(s.id)}">Condividi</button>`:`<button class="btn ghost small" data-a="pdfSave" data-id="D${esc(s.id)}">Scarica</button>`}`:`<button class="btn ghost small" data-a="domPdf">Apri il PDF</button>`}</div></div>`;
-  const min=!!s.minore,F=domForm(s),chi=min?"":(F.firma!=null?F.firma:s.nome);
-  const inp=(k,l,o)=>`<label class="dfld${o&&o.w?" w":""}"><span>${l}</span><input data-df="${k}" value="${esc(F[k]||"")}"${o&&o.t?` type="${o.t}"`:""}${o&&o.ph?` placeholder="${esc(o.ph)}"`:""}${o&&o.up?` style="text-transform:uppercase"`:""} autocomplete="off"></label>`;
-  const manca=[!s.cf&&["al_cf","Codice fiscale dell'allievo",{up:1}],!s.nascita&&["al_nascita","Data di nascita",{t:"date"}],!s.luogo&&["al_luogo","Luogo di nascita"],!s.residenza&&["al_residenza","Residenza (via, numero, CAP, città)",{w:1}]].filter(Boolean);
-  return `<div class="card" id="domCard"><h2>${esc(tit)}</h2><p class="note" style="margin:0 0 10px">Controlla i dati, metti le spunte e firma con il dito. Ricevi subito il PDF firmato anche per email.</p>
-   <dl><dt>Allievo</dt><dd>${esc(s.nome)}</dd>${s.cf?`<dt>Codice fiscale</dt><dd class="mono">${esc(s.cf)}</dd>`:""}${s.nascita?`<dt>Nato/a</dt><dd>${esc(fd(s.nascita))}${s.luogo?" a "+esc(s.luogo):""}</dd>`:""}${s.residenza?`<dt>Residenza</dt><dd>${esc(s.residenza)}</dd>`:""}${min&&s.genitore?`<dt>Genitore</dt><dd>${esc(s.genitore)}</dd>`:""}</dl>
+  const F=domForm(s),min=domMin(s),e=etaDa(F.al_nascita),grande=!min||(e!==null&&e>=16);
+  const inp=(k,l,o)=>`<label class="dfld${o&&o.w?" w":""}"><span>${l}</span><input data-df="${k}" value="${esc(F[k]||"")}"${o&&o.t?` type="${o.t}"`:""}${o&&o.ph?` placeholder="${esc(o.ph)}"`:""}${o&&o.up?` style="text-transform:uppercase" maxlength="16"`:""} autocomplete="off"></label>`;
+  return `<div class="card" id="domCard"><h2>${esc(tit)}</h2><p class="note" style="margin:0 0 4px">Controlla e completa i dati, metti le spunte e firma con il dito. Ricevi subito il PDF firmato anche per email.</p>
+   <div class="dgrp"><h3>Dati dell'allievo</h3><div class="dgrid">${inp("al_cognome","Cognome")}${inp("al_nome","Nome")}${inp("al_cf","Codice fiscale",{up:1})}${inp("al_nascita","Data di nascita",{t:"date"})}${inp("al_luogo","Luogo di nascita",{w:1})}${inp("al_residenza","Residenza (via, numero, CAP, città)",{w:1})}</div>
+    <div id="dRec"${grande?"":" hidden"}><h3 id="dRecT" style="margin-top:12px">${min?"Recapiti del ragazzo o della ragazza (facoltativi, dai 16 anni)":"Recapiti"}</h3><div class="dgrid">${inp("al_cell","Cellulare",{t:"tel"})}${inp("al_email","Email",{t:"email"})}</div></div></div>
+   <div class="dgrp" id="dGen"${min?"":" hidden"}><h3>Genitore o tutore che firma</h3>
+    <div class="dseg"><label><input type="radio" name="dRuolo" data-df="g_ruolo" value="genitore" ${F.g_ruolo!=="tutore"?"checked":""}> Genitore</label><label><input type="radio" name="dRuolo" data-df="g_ruolo" value="tutore" ${F.g_ruolo==="tutore"?"checked":""}> Tutore</label></div>
+    <div class="dgrid">${inp("g_cognome","Cognome")}${inp("g_nome","Nome")}${inp("g_cf","Codice fiscale",{up:1})}${inp("g_nascita","Data di nascita",{t:"date"})}${inp("g_luogo","Luogo di nascita",{w:1})}${inp("g_residenza","Residenza, se diversa da quella dell'allievo",{w:1})}${inp("g_cell","Cellulare",{t:"tel"})}${inp("g_email","Email",{t:"email"})}</div>
+    <p class="note" style="margin:6px 0 0">Chi firma dichiara di esercitare la responsabilità genitoriale d'intesa con l'altro genitore, oppure di esserne l'unico esercente o il tutore.</p></div>
    <details class="dtesto"><summary>Leggi il testo della domanda</summary><div class="note">
     <p><b>Al Consiglio Direttivo di TinkerDance A.S.D.</b></p>
-    <p>${min?`Il/la sottoscritto/a <b>${esc(s.genitore||"")}</b>, genitore o esercente la responsabilità genitoriale, <b>chiede</b> che il/la minore <b>${esc(s.nome)}</b> sia ammesso/a`:`Il/la sottoscritto/a <b>${esc(s.nome)}</b> <b>chiede</b> di essere ammesso/a`} quale socio/a dell'associazione per la stagione sportiva ${esc(stagLunga().replace("/"," - "))}.</p>
+    <p>${min?`Il/la sottoscritto/a, genitore o tutore, <b>chiede</b> che il/la minore <b>${esc((F.al_cognome+" "+F.al_nome).trim())}</b> sia ammesso/a`:`Il/la sottoscritto/a <b>${esc((F.al_cognome+" "+F.al_nome).trim())}</b> <b>chiede</b> di essere ammesso/a`} quale socio/a dell'associazione per la stagione sportiva ${esc(stagLunga().replace("/"," - "))}.</p>
     <p>A tal fine dichiara:</p><ul>
+     ${min?"<li>di esercitare la responsabilità genitoriale d'intesa con l'altro genitore, oppure quale unico esercente o tutore;</li>":""}
      <li>di aver preso visione dello Statuto e del Regolamento interno dell'associazione e di accettarli integralmente;</li>
      <li>di impegnarsi al versamento della quota associativa annuale e delle quote di partecipazione alle attività;</li>
      <li>di consegnare il certificato medico di idoneità all'attività sportiva non agonistica in corso di validità, senza il quale non è possibile frequentare;</li>
      <li>di aver ricevuto e letto l'informativa sul trattamento dei dati personali;</li>
      <li>che i dati indicati sono veritieri.</li></ul>
     <p>Seguono i consensi scelti qui sotto e la firma. Il PDF completo, con l'informativa, arriva dopo la firma.</p></div></details>
-   <p class="note" style="margin:8px 0 0">Dati da correggere? Scrivilo in “I miei dati” › Chiedi una modifica, poi firma.</p>
    <label class="switch"><div><b>Ho letto l'informativa privacy</b><div class="note">Obbligatorio. <a href="/privacy/" target="_blank" rel="noopener">Leggi l'informativa</a></div></div><input type="checkbox" id="dPriv"></label>
    <label class="switch"><div><b>Gruppo WhatsApp del corso</b><div class="note">Per avvisi e comunicazioni.</div></div><input type="checkbox" id="dWa" checked></label>
    <label class="switch"><div><b>Consenso a foto e video</b><div class="note">Uso su sito e social, senza nomi.</div></div><input type="checkbox" id="dImg" ${s.immagini?"checked":""}></label>
-   ${manca.length?`<div class="dgrp"><h3>Dati mancanti ${min?"del/la minore":"dell'allievo"}</h3><div class="dgrid">${manca.map(x=>inp(x[0],x[1],x[2])).join("")}</div></div>`:""}
-   ${min?`<div class="dgrp"><h3>Dati del genitore o tutore che firma</h3>
-    <div class="dseg"><label><input type="radio" name="dRuolo" data-df="g_ruolo" value="genitore" ${F.g_ruolo!=="tutore"?"checked":""}> Genitore</label><label><input type="radio" name="dRuolo" data-df="g_ruolo" value="tutore" ${F.g_ruolo==="tutore"?"checked":""}> Tutore</label></div>
-    <div class="dgrid">${inp("g_cognome","Cognome")}${inp("g_nome","Nome")}${inp("g_cf","Codice fiscale",{up:1})}${inp("g_nascita","Data di nascita",{t:"date"})}${inp("g_luogo","Luogo di nascita")}${inp("g_residenza","Residenza, se diversa da quella del/la minore",{w:1})}${inp("g_cell","Cellulare",{t:"tel"})}${inp("g_email","Email",{t:"email"})}</div>
-    <p class="note" style="margin:6px 0 0">Chi firma dichiara di esercitare la responsabilità genitoriale d'intesa con l'altro genitore, oppure di esserne l'unico esercente o il tutore.</p></div>`:`<label class="note" style="display:block;margin-top:12px">Nome e cognome di chi firma<input id="dNome" data-df="firma" value="${esc(chi)}" autocomplete="name"></label>`}
    <div class="actions prevbox" style="margin-top:14px">${S.pdf&&S.pdf["A"+s.id]?`<a class="btn ghost small" href="${S.pdf["A"+s.id].url}" target="_blank" rel="noopener">Apri l'anteprima PDF</a>`:`<button class="btn ghost small" data-a="domPrev">Vedi il PDF prima di firmare</button>`}</div>
-   <div class="note" style="margin:12px 0 6px">Firma qui con il dito</div>
+   <div class="note" style="margin:12px 0 6px">Firma qui con il dito${min?" (genitore o tutore)":""}</div>
    <div class="sigbox"><canvas id="asig"></canvas><div class="sigph" id="asigph">Firma qui</div></div>
    <div class="actions" style="justify-content:space-between;margin-top:10px"><button class="btn ghost small" data-a="sigClr">Cancella firma</button><button class="btn small" data-a="firma">Firma e invia</button></div></div>`}
 let SIGA=null;
@@ -208,7 +217,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
       b.disabled=true;b.textContent="Invio…";
       try{const j=await sess({tipo:"area_firma",socioId:s.id,privacy:true,whatsapp:$("#dWa").checked,immagini:$("#dImg").checked,firma:nome,firmaImg:SIGA.png(),al:R.al,gen:R.gen});if(!j.ok)throw new Error(j.errore);
         s.domanda={firmata:true,data:j.data,da:nome};pdfBlob(j.pdf,j.nome,"D"+s.id);render();toast("Domanda firmata e inviata: grazie!")}
-      catch(x){b.disabled=false;b.textContent="Firma e invia";if(x.message!=="sessione")toast(x.message==="firma"?"Firma non valida: rifalla più grande":x.message==="genitore"?"Completa i dati del genitore o tutore":x.message==="allievo"?"Completa i dati mancanti dell'allievo":"Invio non riuscito, riprova")}break}
+      catch(x){b.disabled=false;b.textContent="Firma e invia";if(x.message!=="sessione")toast(x.message==="firma"?"Firma non valida: rifalla più grande":x.message==="genitore"?"Completa i dati del genitore o tutore":x.message==="allievo"?"Completa i dati dell'allievo":x.message==="recapiti"?"Indica cellulare o email":"Invio non riuscito, riprova")}break}
     case"domPrev":{const s=kid();b.disabled=true;b.textContent="Preparo il PDF…";try{const j=await sess(Object.assign({tipo:"area_firma",socioId:s.id,anteprima:true,whatsapp:$("#dWa").checked,immagini:$("#dImg").checked},domDati(s)));if(!j.ok)throw new Error(j.errore);pdfBlob(j.pdf,j.nome,"A"+s.id);render();const u=S.pdf["A"+s.id].url;const w=window.open(u,"_blank");if(!w)toast("Anteprima pronta: tocca «Apri l'anteprima PDF»")}
       catch(x){b.disabled=false;b.textContent="Vedi il PDF prima di firmare";if(x.message!=="sessione")toast("Anteprima non disponibile: va pubblicato lo script aggiornato")}break}
     case"domPdf":{const s=kid();b.disabled=true;b.textContent="Un momento…";try{const j=await sess({tipo:"area_domanda",socioId:s.id});if(!j.ok)throw new Error(j.errore);pdfBlob(j.data,j.nome,"D"+s.id);render()}
@@ -218,7 +227,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
     case"sendReq":{const t=$("#fReq").value.trim();if(!t){toast("Scrivi cosa modificare");break}invio(b,async()=>{const j=await sess({tipo:"area_richiesta",testo:t});if(!j.ok)throw new Error(j.errore)},"Richiesta inviata alla segreteria");break}
   }});
 function fotoRidotta(file){return new Promise((ok,ko)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{const n=320,c=document.createElement("canvas");c.width=c.height=n;const x=c.getContext("2d"),m=Math.min(im.width,im.height);x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,n,n);URL.revokeObjectURL(u);ok(c.toDataURL("image/jpeg",.85).split(",")[1])};im.onerror=()=>ko(new Error("img"));im.src=u})}
-document.addEventListener("input",e=>{const t=e.target;if(t.dataset&&t.dataset.df&&S.D&&t.type!=="radio")domForm(kid())[t.dataset.df]=t.value});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset&&t.dataset.df&&S.D&&t.type!=="radio"){domForm(kid())[t.dataset.df]=t.value;if(t.dataset.df==="al_nascita")domToggle()}});
 document.addEventListener("change",async e=>{const t=e.target;if(!S.D)return;
   if(t.dataset&&t.dataset.df)domForm(kid())[t.dataset.df]=t.value;
   if((t.id==="dWa"||t.id==="dImg"||(t.dataset&&t.dataset.df))&&S.pdf){const k="A"+kid().id;if(S.pdf[k]){delete S.pdf[k];const box=document.querySelector("#domCard .prevbox");if(box)box.innerHTML=`<button class="btn ghost small" data-a="domPrev">Vedi il PDF prima di firmare</button>`}}
