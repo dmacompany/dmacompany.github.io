@@ -168,7 +168,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]")
     case"go":S.view=b.dataset.id;render();window.scrollTo(0,0);break;
     case"kid":S.kid=b.dataset.id;render();break;
     case"esci":esci();break;
-    case"paga":{const s=kid();b.disabled=true;b.textContent="Apertura del pagamento…";try{const j=await sess({tipo:"area_paga",socioId:s.id});if(!j.ok)throw new Error(j.errore);location.href=j.url;return}catch(x){if(x.message!=="sessione")toast(x.message==="nulla"?"Non risultano quote da pagare":"Pagamento con carta non disponibile ora: riprova o usa il bonifico")}b.disabled=false;b.textContent="Paga con carta";break}
+    case"paga":{const s=kid();b.disabled=true;b.textContent="Apertura del pagamento…";try{const j=await sess({tipo:"area_paga",socioId:s.id});if(!j.ok){const e=new Error(j.errore);e.det=j.dettaglio;throw e}location.href=j.url;return}catch(x){if(x.message!=="sessione")toast(x.message==="nulla"?"Non risultano quote da pagare":"Pagamento con carta non disponibile ora: riprova o usa il bonifico"+(x.det?" ("+String(x.det).slice(0,160)+")":""))}b.disabled=false;b.textContent="Paga con carta";break}
     case"fotoDel":{const s=kid();try{const j=await sess({tipo:"area_foto",socioId:s.id,azione:"togli"});if(!j.ok)throw 0;s.foto="";s.fotoReg=false;render();toast("Foto tolta")}catch(x){toast("Non riuscito, riprova")}break}
     case"copy":try{await navigator.clipboard.writeText(b.dataset.t);toast("Copiato")}catch(x){toast(b.dataset.t)}break;
     case"pdf":{b.disabled=true;b.textContent="…";try{const j=await sess({tipo:"area_pdf",num:b.dataset.id});if(!j.ok)throw new Error(j.errore);
