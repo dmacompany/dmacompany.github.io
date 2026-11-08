@@ -5,6 +5,12 @@
   var standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   if (standalone) document.documentElement.classList.add("app");
   if ("serviceWorker" in navigator) window.addEventListener("load", function () { navigator.serviceWorker.register(BASE + "sw.js", { scope: BASE }).catch(function () {}); });
+  // L'app riaperta dopo un po' si ricarica da sola: prende sempre l'ultima versione del sito e dati freschi.
+  var nasc = 0;
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) { nasc = Date.now(); return; }
+    if (nasc && Date.now() - nasc > 15 * 60e3 && !document.querySelector("textarea:focus,input:focus")) location.reload();
+  });
   if (standalone) return;
   var bar = document.getElementById("inst"); if (!bar) return;
   var get = function (k) { try { return localStorage.getItem(k) } catch (e) { return null } };
