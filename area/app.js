@@ -9,8 +9,13 @@
   var nasc = 0;
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) { nasc = Date.now(); return; }
-    if (nasc && Date.now() - nasc > 15 * 60e3 && !document.querySelector("textarea:focus,input:focus")) location.reload();
+    if (nasc && Date.now() - nasc > 15 * 60e3 && !mod && !document.querySelector("textarea:focus,input:focus")) location.reload();
   });
+  var mod = false;   // presenze segnate e non ancora salvate: niente ricarica
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest("[data-r]"); if (!t) return;
+    var r = t.getAttribute("data-r"); if (r === "salva") mod = false; else if (t.closest(".prow,.pextra")) mod = true;
+  }, true);
   if (standalone) return;
   var bar = document.getElementById("inst"); if (!bar) return;
   var get = function (k) { try { return localStorage.getItem(k) } catch (e) { return null } };
