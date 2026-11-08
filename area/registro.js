@@ -52,7 +52,7 @@
       <div class="cchips">${corsi().map(x => `<button type="button" class="kid" data-r="corso" data-id="${esc(x.id)}" aria-pressed="${x.id === c.id}">${esc(x.nome)}</button>`).join("")}</div>
       <div class="card"><div class="top2"><div><h2 style="margin:0">${esc(c.nome)}</h2><p class="note" style="margin:2px 0 0">${esc([c.orario, c.ins, c.ass && "assistente " + c.ass].filter(Boolean).join(" · "))}</p></div>
         <label class="dsel">Giorno <input type="date" value="${R.data}" max="${oggi()}" data-r="data"></label></div>
-        ${R.salvato ? `<p class="note" style="margin:10px 0 0">Registro di ${fdata(R.data)} già salvato: puoi correggerlo.</p>` : ""}
+        ${R.salvato ? `<p class="note" style="margin:10px 0 0">Registro di ${fdata(R.data)} già salvato: puoi correggerlo.</p><div class="actions" style="margin-top:8px"><button type="button" class="btn ghost small${R.confC ? " danger" : ""}" data-r="canc">${R.confC ? "Tocca di nuovo per cancellare la lezione del " + fdata(R.data) : "Lezione inserita per errore? Cancellala"}</button></div>` : ""}
         <div class="plist" ${R.carico ? "" : 'aria-busy="true"'}>${R.carico ? (c.allievi || []).map(rigaAllievo).join("") + R.extra.map(rigaExtra).join("") : `<p class="note">Caricamento…</p>`}</div>
         ${R.carico ? `<div class="actions" style="margin-top:10px"><button type="button" class="btn ghost small" data-r="riga">+ Altra riga</button><button type="button" class="btn ghost small" data-r="tutti">Tutti presenti</button></div>` : ""}
       </div>
@@ -141,6 +141,15 @@
       R.conf = null; b.disabled = true;
       try { const j = await sess({ tipo: "staff_ritira", corso: c.id, chiave: k }); if (!j.ok) throw new Error(j.errore);
         c.allievi = (c.allievi || []).filter(x => (x.id || "n:" + x.nome) !== k); delete R.stato[k]; toast("Tolto dal corso: AssoDesk lo aggiorna alla prossima lettura del registro"); }
+      catch (x) { if (x.message === "tipo") toast("Funzione non ancora attiva: va pubblicata la nuova versione dello script"); else if (x.message !== "sessione") toast("Non riuscito (" + (x.message || "rete") + "), riprova"); }
+      render();
+    }
+    else if (a === "canc") {
+      const c = corso();
+      if (!R.confC) { R.confC = true; render(); setTimeout(() => { if (R.confC) { R.confC = false; render(); } }, 6000); return; }
+      R.confC = false; b.disabled = true;
+      try { const j = await sess({ tipo: "staff_cancella", corso: c.id, data: R.data }); if (!j.ok) throw new Error(j.errore);
+        R.stato = {}; R.extra = []; R.salvato = false; R.carico = false; toast("Lezione del " + fdata(R.data) + " cancellata"); }
       catch (x) { if (x.message === "tipo") toast("Funzione non ancora attiva: va pubblicata la nuova versione dello script"); else if (x.message !== "sessione") toast("Non riuscito (" + (x.message || "rete") + "), riprova"); }
       render();
     }

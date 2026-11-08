@@ -129,3 +129,4 @@ html.app body{padding-bottom:env(safe-area-inset-bottom,0px)}
 .ar .hero.stack button.sel{z-index:2}
 .ar .hero.stack button.sel .av.big{box-shadow:0 0 0 3px var(--card),0 0 0 5px var(--rose)}
 .ar .hero.stack button:not(.sel) .av.big{width:48px;height:48px;font-size:16px;opacity:.85}
+.ar .btn.danger{border-color:#B4233A;color:#B4233A;background:#FCE7EA}
