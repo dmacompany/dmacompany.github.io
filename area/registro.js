@@ -56,7 +56,7 @@
         <div class="plist" ${R.carico ? "" : 'aria-busy="true"'}>${R.carico ? (c.allievi || []).map(rigaAllievo).join("") + R.extra.map(rigaExtra).join("") : `<p class="note">Caricamento…</p>`}</div>
         ${R.carico ? `<div class="actions" style="margin-top:10px"><button type="button" class="btn ghost small" data-r="riga">+ Altra riga</button><button type="button" class="btn ghost small" data-r="tutti">Tutti presenti</button></div>` : ""}
       </div>
-      ${R.carico ? `<div class="savebar"><span><b>${pres}</b> present${pres === 1 ? "e" : "i"}</span><button type="button" class="btn" data-r="salva">Salva presenze</button></div>` : ""}
+      ${R.carico ? (R.confS ? `<div class="savebar conf" role="alertdialog" aria-label="Conferma assenti"><div><b>${R.confS.length} ${R.confS.length === 1 ? "allievo non segnato verrà salvato come assente" : "allievi non segnati verranno salvati come assenti"}:</b> <span>${esc(R.confS.join(", "))}</span></div><div class="actions"><button type="button" class="btn ghost small" data-r="salvano">Torna indietro</button><button type="button" class="btn" data-r="salva" data-ok="1">Salva</button></div></div>` : `<div class="savebar"><span><b>${pres}</b> present${pres === 1 ? "e" : "i"}</span><button type="button" class="btn" data-r="salva">Salva presenze</button></div>`) : ""}
     </div>`;
   }
 
@@ -133,6 +133,8 @@
   document.addEventListener("click", async e => {
     const b = e.target.closest("[data-r]"); if (!b || !S.D) return;
     const a = b.dataset.r;
+    if (a !== "salva" && a !== "salvano" && R.confS) R.confS = null;
+    if (a === "salvano") { R.confS = null; render(); return; }
     if (a === "set") { const k = b.dataset.k, cur = R.stato[k] || {}; R.stato[k] = { s: cur.s === b.dataset.v ? "" : b.dataset.v, nota: cur.nota || "" }; render(); }
     else if (a === "xset") { const x = R.extra[+b.dataset.i]; x.s = x.s === b.dataset.v ? "" : b.dataset.v; render(); }
     else if (a === "togli") {
@@ -161,18 +163,21 @@
     else if (a === "ass") { R.ass = true; render(); }
     else if (a === "assno") { R.ass = false; render(); }
     else if (a === "salva") {
-      const c = corso(), righe = [];
-      (c.allievi || []).forEach(al => { const k = al.id || "n:" + al.nome, st = R.stato[k]; if (st && st.s) righe.push({ socio: al.id || "", nominativo: al.nome, stato: st.s, nota: st.nota || "" }); });
-      R.extra.filter(x => x.nome && x.s).forEach(x => righe.push({ socio: "", nominativo: x.nome, stato: x.s, nota: x.nota || "" }));
+      const c = corso(), righe = [], manca = [];
+      (c.allievi || []).forEach(al => { const k = al.id || "n:" + al.nome, st = R.stato[k]; if (st && st.s) righe.push({ socio: al.id || "", nominativo: al.nome, stato: st.s, nota: st.nota || "" }); else { manca.push(al.nome); righe.push({ socio: al.id || "", nominativo: al.nome, stato: "A", nota: (st && st.nota) || "" }); } });
+      R.extra.filter(x => x.nome).forEach(x => { if (!x.s) manca.push(x.nome); righe.push({ socio: "", nominativo: x.nome, stato: x.s || "A", nota: x.nota || "" }); });
+      if (manca.length && !b.dataset.ok) { R.confS = manca; render(); const sb = document.querySelector(".savebar.conf"); if (sb) sb.scrollIntoView({ block: "nearest" }); return; }
+      R.confS = null;
       b.disabled = true; b.textContent = "Salvataggio…";
-      try { const j = await sess({ tipo: "staff_salva", corso: c.id, data: R.data, righe }); if (!j.ok) throw new Error(j.errore); toast("Presenze salvate: " + j.presenti + " presenti"); R.salvato = true; }
+      try { const j = await sess({ tipo: "staff_salva", corso: c.id, data: R.data, righe }); if (!j.ok) throw new Error(j.errore); toast("Presenze salvate: " + j.presenti + " presenti" + (manca.length ? ", " + manca.length + " assent" + (manca.length === 1 ? "e" : "i") : "")); R.salvato = true;
+        (c.allievi || []).forEach(al => { const k = al.id || "n:" + al.nome; if (!R.stato[k] || !R.stato[k].s) R.stato[k] = { s: "A", nota: (R.stato[k] && R.stato[k].nota) || "" }; }); R.extra.forEach(x => { if (x.nome && !x.s) x.s = "A"; }); }
       catch (x) { if (x.message !== "sessione") toast("Salvataggio non riuscito, riprova"); }
       b.disabled = false; b.textContent = "Salva presenze"; render();
     }
   });
   document.addEventListener("change", e => {
     const t = e.target; if (!t.dataset || !t.dataset.r || !S.D) return;
-    if (t.dataset.r === "data" && t.value) { R.data = t.value; R.carico = false; render(); }
+    if (t.dataset.r === "data" && t.value) { R.confS = null; R.data = t.value; R.carico = false; render(); }
     else if (t.dataset.r === "mese") { R.mese = t.value; R.riep = null; render(); }
   });
   document.addEventListener("input", e => { const t = e.target; if (t.dataset && t.dataset.r === "nome") R.extra[+t.dataset.i].nome = t.value; });
