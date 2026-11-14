@@ -41,7 +41,7 @@
   }
   function rigaExtra(e, i) {
     const s = e.s || "";
-    return `<div class="prow extra"><div class="t"><input type="text" placeholder="Nome e cognome (prova o nuovo allievo)" value="${esc(e.nome || "")}" data-r="nome" data-i="${i}" aria-label="Nome allievo riga ${i + 1}"></div>
+    return `<div class="prow extra"><div class="t"><input type="text" placeholder="Cognome e nome (prova o nuovo allievo)" value="${esc(e.nome || "")}" data-r="nome" data-i="${i}" aria-label="Nome allievo riga ${i + 1}"></div>
       <div class="pbs"><button type="button" class="pb P${s === "P" ? " on" : ""}" data-r="xset" data-i="${i}" data-v="P">Presente</button><button type="button" class="pb A${s === "A" ? " on" : ""}" data-r="xset" data-i="${i}" data-v="A">Assente</button></div></div>`;
   }
   function vReg() {
