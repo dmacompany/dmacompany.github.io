@@ -88,10 +88,14 @@ function vHome(){const s=kid(),av=[],dv=dovuti(s);
    <div class="card"><h2>Corsi</h2>${(s.corsi||[]).length?s.corsi.map(c=>`<div class="row"><div class="t"><b>${esc(c.area)}</b><span>${esc(c.corso)}</span></div></div>`).join(""):`<p class="note" style="margin:0">${s.esente?"Staff: nessuna quota dovuta.":"Nessun corso registrato."}</p>`}</div></div>
    ${window.Reg?Reg.sociCard(s):""}
    ${(s.mesi||[]).some(m=>m.v)?`<div class="card"><h2>Quote della stagione</h2>${mesiGrid(s)}</div>`:""}</div>`}
-function vSaggio(s){const g=s.saggio;if(!g||!(g.quota>0))return"";const tit=String(g.titolo||"saggio di fine anno"),anni=(tit.match(/\d{4}\s*-\s*\d{4}/)||[""])[0].replace(/\s/g,""),caus=("Saggio "+anni+" "+s.nome).replace(/\s+/g," ");
-  const prossimo=g.residuo<=0?"":g.versato<g.acconto?`Acconto ${eur(g.accontoResiduo)} entro il ${fd(g.scadA)} · saldo entro il ${fd(g.scadS)}`:`Saldo entro il ${fd(g.scadS)}`;
+function vSaggio(s){const g=s.saggio;if(!g)return"";const nt=String(g.nota||"");
+  if(!(g.quota>0)){const t0=String(g.titolo||"saggio di fine anno"),pz=nt.split(" · "),bd=pz[0]||"Esente",sub=pz.slice(1).join(" · ");return `<div class="card"><h2>${esc(t0.charAt(0).toUpperCase()+t0.slice(1))}</h2>
+   <div class="row"><div class="t"><b>Quota di partecipazione</b><span>${esc(sub||g.cat||"")}</span></div><span class="pill ok">${esc(bd)}</span></div>
+   <div class="alert ok" style="margin-top:8px"><b>Nessuna quota da versare</b>Ci vediamo sul palco!</div></div>`}
+  const tit=String(g.titolo||"saggio di fine anno"),anni=(tit.match(/\d{4}\s*-\s*\d{4}/)||[""])[0].replace(/\s/g,""),caus=("Saggio "+anni+" "+s.nome).replace(/\s+/g," ");
+  const prossimo=g.residuo<=0?"":g.accontoResiduo>=g.residuo?`Entro il ${fd(g.scadA)}`:g.versato<g.acconto?`Acconto ${eur(g.accontoResiduo)} entro il ${fd(g.scadA)} · saldo entro il ${fd(g.scadS)}`:`Saldo entro il ${fd(g.scadS)}`;
   return `<div class="card"><h2>${esc(tit.charAt(0).toUpperCase()+tit.slice(1))}</h2>
-   <div class="row"><div class="t"><b>Quota di partecipazione</b><span>${esc(g.cat||"")}</span></div><span class="num">${eur(g.quota)}</span></div>
+   <div class="row"><div class="t"><b>Quota di partecipazione</b><span>${esc([g.cat,nt].filter(Boolean).join(" · "))}</span></div><span class="num">${eur(g.quota)}</span></div>
    ${g.versato?`<div class="row"><div class="t"><b>Già versato</b></div><span class="num">${eur(g.versato)}</span></div>`:""}
    ${g.residuo>0?`<div class="row"><div class="t"><b>${g.scaduto>0?"Da versare subito: "+eur(g.scaduto)+" scaduti":"Da versare"}</b><span>${esc(prossimo)}</span></div><span class="num">${eur(g.residuo)}</span></div>
     ${S.D.carta?`<div class="paga2">${g.accontoResiduo>0&&g.accontoResiduo<g.residuo?`<button class="btn" data-a="pagaSg" data-o="acconto">Acconto con carta · ${eur(g.accontoResiduo)}</button>`:""}<button class="btn" data-a="pagaSg" data-o="tutto">${g.versato?"Saldo":"Tutto"} con carta · ${eur(g.residuo)}</button></div>`:""}
