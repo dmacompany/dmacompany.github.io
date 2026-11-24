@@ -1,8 +1,8 @@
 /* Area soci DMA COMPANY – service worker: apre l'app anche con rete lenta.
    I dati personali non vengono mai salvati qui: passano solo le pagine e la grafica. */
 const BASE = self.registration.scope.replace(location.origin, "");   // "/area/" oppure "/registro/"
-const V = "dma-" + BASE.replace(/\//g, "") + "-v35";
-const SHELL = [BASE, "/area/area.js?v=29", "/area/area.css?v=20", "/area/registro.js?v=10", "/area/app.js?v=7", "/fonts/montserrat.css",
+const V = "dma-" + BASE.replace(/\//g, "") + "-v36";
+const SHELL = [BASE, "/area/area.js?v=30", "/area/area.css?v=20", "/area/registro.js?v=10", "/area/app.js?v=7", "/fonts/montserrat.css",
   "/fonts/montserrat-latin-400-normal.woff2", "/fonts/montserrat-latin-600-normal.woff2", "/fonts/montserrat-latin-700-normal.woff2",
   BASE + "icon-192.png", BASE + "apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
